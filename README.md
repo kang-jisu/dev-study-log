@@ -7,4 +7,14 @@
 #### java
 
 - [메소드 참조, 정적메소드](./background/java/정적메소드.md)
-- 
+-
+
+#### spring
+
+- [Dto와 Entity](./background/spring/Dto와Entity.md)
+-
+
+#### algorithm
+
+- [BinarySearch](./background/algorithm/BinarySearch.md)
+-

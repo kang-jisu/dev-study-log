@@ -12,7 +12,7 @@
 #### spring
 
 - [Dto와 Entity](./background/spring/Dto와Entity.md)
--
+- [컨트롤러가 클라이언트의 요청 데이터를 받아오는 방법](./background/spring/Controller가%20클라이언트의%20요청데이터를%20받아오는%20방법.md)
 
 #### algorithm
 

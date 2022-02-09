@@ -8,11 +8,11 @@ SpringBoot에서 RestController 구현시 요청을 받아오는 방법에 대�
 
 * [HTTP Method](#http-method)
 * [데이터를 받아오는 방법](#데이터를-받아오는-방법)
-    + [HttpServletRequest](#httpservletrequest)
-    + [@PathVariable](#pathvariable)
-    + [@RequestParam](#requestparam)
-    + [@ModelAttribute](#modelattribute)
-    + [@RequestBody](#requestbody)
+  + [HttpServletRequest](#httpservletrequest)
+  + [@PathVariable](#pathvariable)
+  + [@RequestParam](#requestparam)
+  + [@ModelAttribute](#modelattribute)
+  + [@RequestBody](#requestbody)
 * [정리](#정리)
 
 <br/>
@@ -34,7 +34,7 @@ SpringBoot에서 RestController 구현시 요청을 받아오는 방법에 대�
 #### DELETE
 
 - body에 데이터 포함 안하는걸 권장( GET과 같이 header에 데이터 포함)
-    - 톰캣은 request body를 post일때만 파싱한다
+  - 톰캣은 request body를 post일때만 파싱한다
 
 **Get과 delete는 url과 query만을 이용해야하고, post만 body를 사용할 수 있다**는 것을 잊지 말아야한다.
 
@@ -68,6 +68,7 @@ public void servletReqeust(HttpServletRequest httpRequest) {
 
 <details>
  <summary> httpServletRequest 테스트</summary>
+
 
  ```java
 @Test
@@ -167,24 +168,21 @@ Error message = Required request parameter 'id' for method parameter type Long i
 <details>
   <summary> request param 테스트 </summary>
 
+
   ```java
-    @Test
-    public void requestParam() throws Exception{
-        mockMvc.perform(get("/request-param")
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .param("id","1")
-                .param("name","jisu"))
-                .andDo(print())
-                .andReturn();
-    }
+  @Test
+  public void requestParam() throws Exception{
+      mockMvc.perform(get("/request-param")
+              .contentType(MediaType.APPLICATION_JSON_VALUE)
+              .param("id","1")
+              .param("name","jisu"))
+              .andDo(print())
+              .andReturn();
+  }
   ```
 
 ```bash
-INFO 18398 --- [    Test worker] c.d.s.httpRequest.RequestBodyController  : jisu
-INFO 18398 --- [    Test worker] c.d.s.httpRequest.RequestBodyController  : 1
-INFO 18398 --- [    Test worker] c.d.s.httpRequest.RequestBodyController  : default
-INFO 18398 --- [    Test worker] c.d.s.httpRequest.RequestBodyController  : id:1
-INFO 18398 --- [    Test worker] c.d.s.httpRequest.RequestBodyController  : name:jisu
+INFO 18398 --- [    Test worker] c.d.s.httpRequest.RequestBodyController  : jisuINFO 18398 --- [    Test worker] c.d.s.httpRequest.RequestBodyController  : 1INFO 18398 --- [    Test worker] c.d.s.httpRequest.RequestBodyController  : defaultINFO 18398 --- [    Test worker] c.d.s.httpRequest.RequestBodyController  : id:1INFO 18398 --- [    Test worker] c.d.s.httpRequest.RequestBodyController  : name:jisu
 ```
 
 </details>
@@ -196,7 +194,7 @@ INFO 18398 --- [    Test worker] c.d.s.httpRequest.RequestBodyController  : name
 >Annotation that binds a method parameter or method return value to a named model attribute, exposed to a web view. Supported for controller classes with @RequestMapping methods.
 
 - 클라이언트가 보내는 HTTP 파라미터들을 특정 Object에 바인딩
-    - 생성자 또는 setter메서드 필요
+  - 생성자 또는 setter메서드 필요
 - Query String 및 Form 형식 데이터만 처리
 
 `@ModelAttribute`를 사용하면 `?name=&id=` 받아올 값이 많아졌을 경우에  `@RequestParam`로 하나씩 받아오지 않고  미리 만들어둔 객체로 바인딩시킬 수 있다. 주의할점은 **이때 객체에 각각의 변수에 setter함수(또는 생성자)가 없다면 저장되지 않는다.**
@@ -206,18 +204,11 @@ INFO 18398 --- [    Test worker] c.d.s.httpRequest.RequestBodyController  : name
 <br/>
 
 ```java
-@Setter
-public class ModelAttributeDto {
-    private String name;
-    private Long id;
-}
+@Setterpublic class ModelAttributeDto {    private String name;    private Long id;}
 ```
 
 ```java
-    @GetMapping("/model-attribute")
-    public ResponseEntity<ModelAttributeDto> modelAttribute(@ModelAttribute ModelAttributeDto requestDto) {
-        return ResponseEntity.ok(requestDto);
-    }
+    @GetMapping("/model-attribute")    public ResponseEntity<ModelAttributeDto> modelAttribute(@ModelAttribute ModelAttributeDto requestDto) {        return ResponseEntity.ok(requestDto);    }
 ```
 
 
@@ -225,19 +216,11 @@ public class ModelAttributeDto {
 <details>
   <summary> 테스트 </summary>
 
+
   ```java
-    @Test
-    public void modelAttribute() throws Exception{
-        mockMvc.perform(get("/model-attribute")
-                .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .param("id","1")
-                .param("name","jisu"))
-                .andDo(print())
-                .andExpect(jsonPath("name").value("jisu"))
-                .andExpect(jsonPath("id").value("1"))
-                .andReturn();
-    }
+  @Test  public void modelAttribute() throws Exception{      mockMvc.perform(get("/model-attribute")              .contentType(MediaType.APPLICATION_JSON_VALUE)              .param("id","1")              .param("name","jisu"))              .andDo(print())              .andExpect(jsonPath("name").value("jisu"))              .andExpect(jsonPath("id").value("1"))              .andReturn();  }
   ```
+
 </details>
 
 
@@ -276,34 +259,19 @@ RequestParam의 경우 잘못된 요청이 들어오면(값이 없는 경우) `4
   <summary> BindingResult사용 </summary>
 
 
+
   ```java
-    @Test
-  @DisplayName("Long에 String을 넣었을 때 BindingResult 객체에 저장되는지 테스트 ")
-  public void modelAttributeBindingResult() throws Exception{
-      mockMvc.perform(get("/model-attribute/binding")
-              .contentType(MediaType.APPLICATION_JSON_VALUE)
-              .param("id","ㅁㄴ")
-              .param("name","jisu"))
-              .andDo(print())
-              .andReturn();
-  }
+  @Test@DisplayName("Long에 String을 넣었을 때 BindingResult 객체에 저장되는지 테스트 ")public void modelAttributeBindingResult() throws Exception{    mockMvc.perform(get("/model-attribute/binding")            .contentType(MediaType.APPLICATION_JSON_VALUE)            .param("id","ㅁㄴ")            .param("name","jisu"))            .andDo(print())            .andReturn();}
   ```
 
   ```java
-    @GetMapping("/model-attribute/binding")
-  public ResponseEntity<String> modelAttributeBindingResult(@ModelAttribute ModelAttributeDto requestDto, BindingResult bindingResult) {
-      log.info("request : {},{}",requestDto.getId(), requestDto.getName());
-      bindingResult.getFieldErrors().stream()
-              .forEach( error-> log.info("{} ,{}", error.getField(), String.valueOf(error.getRejectedValue())));
-      return null;
-  }
+  @GetMapping("/model-attribute/binding")public ResponseEntity<String> modelAttributeBindingResult(@ModelAttribute ModelAttributeDto requestDto, BindingResult bindingResult) {    log.info("request : {},{}",requestDto.getId(), requestDto.getName());    bindingResult.getFieldErrors().stream()            .forEach( error-> log.info("{} ,{}", error.getField(), String.valueOf(error.getRejectedValue())));    return null;}
   ```
 
 결과
 
   ```bash
-INFO 20842 --- [    Test worker] c.d.s.httpRequest.RequestBodyController  : request : null,jisu
-INFO 20842 --- [    Test worker] c.d.s.httpRequest.RequestBodyController  : id ,ㅁㄴ
+INFO 20842 --- [    Test worker] c.d.s.httpRequest.RequestBodyController  : request : null,jisuINFO 20842 --- [    Test worker] c.d.s.httpRequest.RequestBodyController  : id ,ㅁㄴ
   ```
 
 </details>
@@ -312,52 +280,25 @@ INFO 20842 --- [    Test worker] c.d.s.httpRequest.RequestBodyController  : id ,
   <summary> @Valid와 BindingResult같이 사용 </summary>
 
 
+
 DTO에 validation 지정
 
   ```java
-  @Setter
-@Getter
-public class ModelAttributeDto {
-
-    private String name;
-    @Range(min=20, message = "20이상이어야 합니다.")
-    private Long id;
-
-}
+  @Setter@Getterpublic class ModelAttributeDto {    private String name;    @Range(min=20, message = "20이상이어야 합니다.")    private Long id;}
   ```
 
 ```java
-      @GetMapping("/model-attribute/valid")
-    public ResponseEntity<String> modelAttributeValid(@Valid @ModelAttribute ModelAttributeDto requestDto, BindingResult bindingResult) {
-        log.info("request : {},{}",requestDto.getId(), requestDto.getName());
-
-        if(bindingResult.hasErrors()) {
-            bindingResult.getFieldErrors().stream()
-                    .forEach( error-> log.info("{} ,{}, {}", error.getField(), String.valueOf(error.getRejectedValue()), error.getDefaultMessage()));
-        }
-        return null;
-    }
+      @GetMapping("/model-attribute/valid")    public ResponseEntity<String> modelAttributeValid(@Valid @ModelAttribute ModelAttributeDto requestDto, BindingResult bindingResult) {        log.info("request : {},{}",requestDto.getId(), requestDto.getName());        if(bindingResult.hasErrors()) {            bindingResult.getFieldErrors().stream()                    .forEach( error-> log.info("{} ,{}, {}", error.getField(), String.valueOf(error.getRejectedValue()), error.getDefaultMessage()));        }        return null;    }
 ```
 
  ```java
-     @Test
-   @DisplayName("Long에 20 이하의 값을 넣었을 떄BindingResult 객체에 저장되는지 테스트 ")
-   public void modelAttributeBindingValid() throws Exception{
-       mockMvc.perform(get("/model-attribute/valid")
-               .contentType(MediaType.APPLICATION_JSON_VALUE)
-               .param("id","10")
-               .param("name","jisu"))
-               .andDo(print())
-               .andReturn();
-   } 
+    @Test  @DisplayName("Long에 20 이하의 값을 넣었을 떄BindingResult 객체에 저장되는지 테스트 ")  public void modelAttributeBindingValid() throws Exception{      mockMvc.perform(get("/model-attribute/valid")              .contentType(MediaType.APPLICATION_JSON_VALUE)              .param("id","10")              .param("name","jisu"))              .andDo(print())              .andReturn();  } 
  ```
 
 결과
 
   ```bash
-  
- 2022-02-09 20:21:04.557  INFO 21074 --- [    Test worker] c.d.s.httpRequest.RequestBodyController  : request : 10,jisu
-2022-02-09 20:21:04.559  INFO 21074 --- [    Test worker] c.d.s.httpRequest.RequestBodyController  : id ,10, 20이상이어야 합니다.
+   2022-02-09 20:21:04.557  INFO 21074 --- [    Test worker] c.d.s.httpRequest.RequestBodyController  : request : 10,jisu2022-02-09 20:21:04.559  INFO 21074 --- [    Test worker] c.d.s.httpRequest.RequestBodyController  : id ,10, 20이상이어야 합니다.
   ```
 
 </details>
@@ -368,45 +309,23 @@ public class ModelAttributeDto {
   <summary> Get에서 데이터 바인딩 방법 - WebDataBinder 과 Setter 없이 바인딩시키기 </summary>
 
 
+
 #### WebDataBinder
 
 위에 적은대로 setter를 사용해야 바인딩이 되는 이유는 GET요청으로 들어오는 Query parameter의 경우 `WebDataBinder`를 사용하는데 기본 값으로 값을 할당하는 방법이 **Java Bean** 방식이다 (Setter를 통한 값 할당 )
 
 ```java
-/**
- * Initialize standard JavaBean property access for this DataBinder.
- * <p>This is the default; an explicit call just leads to eager initialization.
- * @see #initDirectFieldAccess()
- * @see #createBeanPropertyBindingResult()
- */
-public void initBeanPropertyAccess() {
-   Assert.state(this.bindingResult == null,
-         "DataBinder is already initialized - call initBeanPropertyAccess before other configuration methods");
-   this.directFieldAccess = false;
-}
+/** * Initialize standard JavaBean property access for this DataBinder. * <p>This is the default; an explicit call just leads to eager initialization. * @see #initDirectFieldAccess() * @see #createBeanPropertyBindingResult() */public void initBeanPropertyAccess() {   Assert.state(this.bindingResult == null,         "DataBinder is already initialized - call initBeanPropertyAccess before other configuration methods");   this.directFieldAccess = false;}
 ```
 
 만약에 Setter를 사용하지 않고도 값을 받아오게 하려면 컨트롤러에 @InitBinder어노테이션을 이용해서 `initDirectFieldAccess` 설정으로 setter 없이 direct access 하게 할 수 있다.
 
 ```java
-/**
- * Initialize direct field access for this DataBinder,
- * as alternative to the default bean property access.
- * @see #initBeanPropertyAccess()
- * @see #createDirectFieldBindingResult()
- */
-public void initDirectFieldAccess() {
-   Assert.state(this.bindingResult == null,
-         "DataBinder is already initialized - call initDirectFieldAccess before other configuration methods");
-   this.directFieldAccess = true;
-}
+/** * Initialize direct field access for this DataBinder, * as alternative to the default bean property access. * @see #initBeanPropertyAccess() * @see #createDirectFieldBindingResult() */public void initDirectFieldAccess() {   Assert.state(this.bindingResult == null,         "DataBinder is already initialized - call initDirectFieldAccess before other configuration methods");   this.directFieldAccess = true;}
 ```
 
 ```java
-    @InitBinder
-    public void initBinder(WebDataBinder binder) {
-        binder.initDirectFieldAccess();
-    }
+    @InitBinder    public void initBinder(WebDataBinder binder) {        binder.initDirectFieldAccess();    }
 ```
 
 컨트롤러에 이걸 추가하고 DTO에 setter를 삭제했더니 바인딩이 성공했다.
@@ -437,6 +356,7 @@ WebDataBinder (converter, databinder, formatter... )등과 관련해서는 따�
 
 <details>
   <summary> readWithMessageConverters 함수 전체 </summary>
+
 
 ```java
   protected <T> Object readWithMessageConverters(HttpInputMessage inputMessage, MethodParameter parameter,
@@ -530,9 +450,9 @@ WebDataBinder (converter, databinder, formatter... )등과 관련해서는 따�
 
 - @RequestBody를 사용하면 요청 본문 데이터가 적합한 HttpMessageConverter를 통해 파싱되어 자바 객체로 변환된다.
 - 종류
-    - StringHttpMessageConverter : 기본 문자 처리
-    - MappingJackson2HttpMessageConverter 기본 객체 처리
-    - ![HttpMessageConverter](./image/HttpMessageConverter.png)
+  - StringHttpMessageConverter : 기본 문자 처리
+  - MappingJackson2HttpMessageConverter 기본 객체 처리
+  - ![HttpMessageConverter](./image/HttpMessageConverter.png)
 
 </br>
 
@@ -541,8 +461,7 @@ WebDataBinder (converter, databinder, formatter... )등과 관련해서는 따�
 SpringBoot에서 기본적으로 제공되는 라이브러리이다. (`spring-boot-starter-web`)
 
 ```java
-ObjectMapper objectMapper = new ObjectMapper();
-objectMapper.readValue(messagBody, DataDto.class); 
+ObjectMapper objectMapper = new ObjectMapper();objectMapper.readValue(messagBody, DataDto.class); 
 ```
 
 이런식으로 읽어옴
@@ -570,11 +489,7 @@ ObjectMapper를 통해서 Json값을 Java 객체로 역직렬화
 ##### objectMapper가 readValue
 
 ```java
-public class RequestBodyDto {
-    String name;
-    Long age;
-    Color favoriteColor;
-}
+public class RequestBodyDto {    String name;    Long age;    Color favoriteColor;}
 ```
 
 ```java
@@ -631,16 +546,15 @@ public void requestBodyMap() throws Exception {
 ```
 
 - Long <-> String | Enum <-> 맞지 않는 String 같이 body에 값이 아예 잘못 입력될 경우
-    - HTTP 400 Bad Reqeust
-    - controller에서 처리하기 전에 Exception처리되기때문에 따로 처리하고 싶으면 converter를 사용해야한다.
-    - Enum의 경우 Enum class에 @JsonCreator로 처리하는 방법도 있긴 한데
-        - null로 변경 -> Enum 값에 null이 들어가서 애매함, null로 변경시킨 후 validation하면 에러처리할때 메세지에 잘못입력한값을 null로 표시해야됨(사용자가 실제로 잘못 입력한 값 말고 )
-        - throw exception -> exception 메세지가 변경되기는 하는데 똑같이 400 bad request (HttpMessageNotReadableException)인 상태로 메세지만 다르게 들어감. 다른 400 에러랑 같이 HttpMessageNotReadableException 핸들러에서 처리하는게 뭔가 별로임
-        - 여튼 Enum값은 custom converter -> @JsonCreator or objectMapper -> validation  이 순서로 처리되는 것 같은데 핸들링하고싶은 상황 봐서 하면 될듯..
+  - HTTP 400 Bad Reqeust
+  - controller에서 처리하기 전에 Exception처리되기때문에 따로 처리하고 싶으면 converter를 사용해야한다. --> converter는 param에서는 되는데 json으로 보내는 body오류는 못잡는 것 같다. 
+  - Enum의 경우 Enum class에 @JsonCreator로 처리하는 방법도 있긴 한데
+    - null로 변경 -> Enum 값에 null이 들어가서 애매함, null로 변경시킨 후 validation하면 에러처리할때 메세지에 잘못입력한값을 null로 표시해야됨(사용자가 실제로 잘못 입력한 값 말고 ) / UNKNOWN이라는 ENUM을 하나 더 추가하고 에러처리 
+    - throw exception -> exception 메세지가 변경되기는 하는데 똑같이 400 bad request (HttpMessageNotReadableException)인 상태로 메세지만 다르게 들어감. 다른 400 에러랑 같이 HttpMessageNotReadableException 핸들러에서 처리 -> InvalidFormatException의 Instace인지 확인
 - Long, String, Enum 지정한 타입에 맞게 들어왔는데 그 안에서 validation을 하는 경우 (@Valid사용)
-    - Errors 객체로 받아와 컨트롤러 내부에서 throw excpetion 해주거나 다른 Default값으로 바꿔줌
-    - GlobalExceptionHandler를 만들어서 `MethodArgumentNotValidException`에 대해서 처리
-    - Validated로 지정하는건 좀 더 알아보기
+  - Errors 객체로 받아와 컨트롤러 내부에서 throw excpetion 해주거나 다른 Default값으로 바꿔줌
+  - GlobalExceptionHandler를 만들어서 `MethodArgumentNotValidException`에 대해서 처리
+  - Validated로 지정하는건 좀 더 알아보기
 
 ```java
 @Test
@@ -670,15 +584,15 @@ public void requestBodyERROR() throws Exception {
 
 1. http://localhost:8080/board/1
 
-    1. @PathVariable사용
+   1. @PathVariable사용
 
 2. http://localhost:8080/board?id=1&name=kang
 
-    1. @RequestParam, @ModelAttribute 사용
+   1. @RequestParam, @ModelAttribute 사용
 
 3. http://localhost:8080/board
 
-    1. POST에서 @RequestBody 사용
+   1. POST에서 @RequestBody 사용
 
    ```
    //body

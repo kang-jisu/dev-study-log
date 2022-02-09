@@ -3,6 +3,7 @@ package com.dev.studylog.httpRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
+import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
@@ -19,11 +20,6 @@ public class RequestBodyController {
 //        binder.initDirectFieldAccess();
 //    }
 
-    @PostMapping("/request-body")
-    public ResponseEntity<String> requestBody(@RequestBody String name, @RequestBody Long id, HttpServletRequest httpRequest) {
-        log.info(name);
-        return ResponseEntity.ok(name);
-    }
 
     @PostMapping("/servlet-request")
     public void servletRequest(HttpServletRequest httpRequest) {
@@ -80,5 +76,16 @@ public class RequestBodyController {
                     .forEach(error -> log.info("{} ,{}, {}", error.getField(), String.valueOf(error.getRejectedValue()), error.getDefaultMessage()));
         }
         return null;
+    }
+
+    @PostMapping("/request-body")
+    public ResponseEntity<RequestBodyDto> requestBody(@RequestBody RequestBodyDto requestBodyDto) {
+        return ResponseEntity.ok(requestBodyDto);
+    }
+
+    @PostMapping("/request-body/valid")
+    public ResponseEntity<RequestBodyDto> requestBodyValid(@Valid @RequestBody RequestBodyDto requestBodyDto ){
+
+        return ResponseEntity.ok(requestBodyDto);
     }
 }

@@ -1,6 +1,8 @@
 package com.dev.studylog.httpRequest;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -10,12 +12,16 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.util.HashMap;
+
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(RequestBodyController.class)
 @ExtendWith(SpringExtension.class)
+@Slf4j
 public class RequestBodyControllerTest {
 
     @Autowired
@@ -101,7 +107,7 @@ public class RequestBodyControllerTest {
     }
 
     @Test
-    @DisplayName("Long에 20 이하의 값을 넣었을 떄BindingResult 객체에 저장되는지 테스트 ")
+    @DisplayName("Long에 20 이하의 값을 넣었을 떄 BindingResult 객체에 저장되는지 테스트 ")
     public void modelAttributeBindingValid() throws Exception{
         mockMvc.perform(get("/model-attribute/valid")
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
@@ -110,4 +116,59 @@ public class RequestBodyControllerTest {
                 .andDo(print())
                 .andReturn();
     }
+
+    @Test
+    @DisplayName("RequestBodyDto objectMapper 테스트")
+    public void reqeustBodyObjectMapper() throws JsonProcessingException {
+        String requestBody = "{\"name\": \"jisu\",\"age\": 1,\"favoriteColor\" : \"RED\"}";
+        RequestBodyDto requestBodyDto = objectMapper.readValue(requestBody, RequestBodyDto.class);
+        log.info(requestBodyDto.toString());
+    }
+
+    @Test
+    @DisplayName("requestBody 테스트")
+    public void requestBody() throws Exception {
+        String requestBody = "{\"name\": \"jisu\",\"age\": 1,\"favoriteColor\" : \"RED\"}";
+        mockMvc.perform(post("/request-body")
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .content(requestBody))
+                .andExpect(jsonPath("name").value("jisu"))
+                .andExpect(jsonPath("age").value(1))
+                .andExpect(jsonPath("favoriteColor").value("RED"))
+                .andDo(print())
+                .andReturn();
+    }
+
+    @Test
+    @DisplayName("requestBody 테스트 Map")
+    public void requestBodyMap() throws Exception {
+        HashMap<String, Object> map = new HashMap<>();
+        map.put("name","jisu");
+        map.put("age",1);
+        map.put("favoriteColor","RED");
+        mockMvc.perform(post("/request-body")
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .content(objectMapper.writeValueAsString(map)))
+                .andExpect(jsonPath("name").value("jisu"))
+                .andExpect(jsonPath("age").value(1))
+                .andExpect(jsonPath("favoriteColor").value("RED"))
+                .andDo(print())
+                .andReturn();
+    }
+
+    @Test
+    @DisplayName("requestBody 테스트 Map 값 잘못 들어갔을 때 ")
+    public void requestBodyERROR() throws Exception {
+        HashMap<String, Object> map = new HashMap<>();
+        map.put("name","jisu");
+        map.put("age",200);
+        map.put("favoriteColor","GREE");
+        mockMvc.perform(post("/request-body/valid")
+                .contentType(MediaType.APPLICATION_JSON_VALUE)
+                .content(objectMapper.writeValueAsString(map)))
+                .andExpect(status().isBadRequest())
+                .andDo(print())
+                .andReturn();
+    }
+
 }

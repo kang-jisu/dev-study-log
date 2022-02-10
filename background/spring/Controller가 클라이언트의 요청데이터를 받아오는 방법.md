@@ -549,6 +549,7 @@ public void requestBodyMap() throws Exception {
   - HTTP 400 Bad Reqeust
   - controller에서 처리하기 전에 Exception처리되기때문에 따로 처리하고 싶으면 converter를 사용해야한다. --> converter는 param에서는 되는데 json으로 보내는 body오류는 못잡는 것 같다. 
   - Enum의 경우 Enum class에 @JsonCreator로 처리하는 방법도 있긴 한데
+    - @JsonCreator는 `static` 으로 만들어줘야 인식한다. 
     - null로 변경 -> Enum 값에 null이 들어가서 애매함, null로 변경시킨 후 validation하면 에러처리할때 메세지에 잘못입력한값을 null로 표시해야됨(사용자가 실제로 잘못 입력한 값 말고 ) / UNKNOWN이라는 ENUM을 하나 더 추가하고 에러처리 
     - throw exception -> exception 메세지가 변경되기는 하는데 똑같이 400 bad request (HttpMessageNotReadableException)인 상태로 메세지만 다르게 들어감. 다른 400 에러랑 같이 HttpMessageNotReadableException 핸들러에서 처리 -> InvalidFormatException의 Instace인지 확인
 - Long, String, Enum 지정한 타입에 맞게 들어왔는데 그 안에서 validation을 하는 경우 (@Valid사용)

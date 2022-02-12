@@ -12,6 +12,8 @@ DB에서 꺼낸 데이터를 저장하는 Entity를 가지고 일종의 Wrapper�
 
 DTO는 특별한 로직을 가지지 않는 순수한 데이터 객체여야하며 Setter를 만들지 않고 생성자에서 값을 할당한다. (Builder패턴 이용)
 
+- 필요한 시점에 사용하기 위해 만드는 객체이므로 생성하는 시점에 필요한 값을 다 전해준다. Setter로 값이 변환될 상황을 열어두고 개발할 필요가 없다고 정리해봤다. 혹시나 필요하더라도 아예 변수를 변경하는 public 함수(updateXX와 같은)를 만드는게 나은 것 같다. 
+
 
 
 ### Entity와 Dto 분리 이유
@@ -59,6 +61,7 @@ modelmapper를 사용해도 되는데 일단은 그냥 매핑이 필요할 때 �
 
 - `XxxDto of(XxxEntity entity)`
   - Dto값에 관계 없이 인자로 들어오는 entity값에 대해서 결과를 반환하므로 static으로 만들면 될 것 같다. 
+  - `static`으로 선언하게 되면 다른 곳에서 사용할 때 클래스의 인스턴스를 생성하지 않고도 바로 사용할 수 있다. 
 - `XxxEntity toEntity()`
   - dto함수에서 호출하므로 인자는 필요없고 값을 채울 때 바로 `builder().name(this.name).build()`이런식으로 만들면 될 것 같다. 
 

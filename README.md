@@ -7,7 +7,7 @@
 #### java
 
 - [메소드 참조, 정적메소드](./background/java/정적메소드.md)
--
+- [String](./background/java/String.md)
 
 #### spring
 

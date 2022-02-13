@@ -76,7 +76,8 @@ public class RequestBodyControllerTest {
     public void queryEnum() throws  Exception {
         mockMvc.perform(get("/enum/RED")
                 .contentType(MediaType.APPLICATION_JSON_VALUE)
-                .param("color2", "GREN"))
+                .param("myColor2", "GREN"))
+                .andExpect(status().is4xxClientError())
                 .andDo(print())
                 .andReturn();
         //2022-02-09 17:53:47.906  WARN 18686 --- [    Test worker] .w.s.m.s.DefaultHandlerExceptionResolver : Resolved [org.springframework.web.method.annotation.MethodArgumentTypeMismatchException: Failed to convert value of type 'java.lang.String' to required type 'com.dev.studylog.httpRequest.Color'; nested exception is org.springframework.core.convert.ConversionFailedException: Failed to convert from type [java.lang.String] to type [@org.springframework.web.bind.annotation.RequestParam com.dev.studylog.httpRequest.Color] for value 'GREN'; nested exception is java.lang.IllegalArgumentException: No enum constant com.dev.studylog.httpRequest.Color.GREN]

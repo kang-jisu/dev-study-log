@@ -9,7 +9,7 @@ import java.util.Arrays;
 
 public class EnumLowerCaseTest {
 
-    static private enum GameType{
+    private enum GameType{
         REGULAR,
         LEAGUE,
     }

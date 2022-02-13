@@ -3,7 +3,6 @@ package com.dev.studylog.httpRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
-import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
@@ -47,11 +46,11 @@ public class RequestBodyController {
     }
 
     // TODO ENUM CHECK
-    @GetMapping("/enum/{color1}")
-    public void queryEnum(@PathVariable Color color1, @RequestParam Color color2) {
-        log.info(String.valueOf(color1));
-        log.info(String.valueOf(color2));
-        log.info(String.valueOf(color1.equals(Color.RED)));
+    @GetMapping("/enum/{myColor1}")
+    public void queryEnum(@PathVariable MyColor myColor1, @RequestParam MyColor myColor2) {
+        log.info(String.valueOf(myColor1));
+        log.info(String.valueOf(myColor2));
+        log.info(String.valueOf(myColor1.equals(MyColor.RED)));
     }
 
     @GetMapping("/model-attribute")

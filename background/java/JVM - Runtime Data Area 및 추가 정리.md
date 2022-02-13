@@ -66,9 +66,10 @@ JVM이 시작될 때 실행되고, JVM이 종료되면 해제된다.
 
 - Eden ( Young Generation)
   - 객체가 생성되면 처음 저장되는 공간
-  - 일정시간이 지나 Eden공간이 꽉차면 쓸모없는 데이터는 Minor GC에 의해 삭제되고 나머지는 Survivor1로 복사된다.
-- Survivor 1& 2 (Yong Generation)
+  - 일정시간이 지나 Eden공간이 꽉차면 쓸모없는 데이터는 Minor GC에 의해 삭제되고 나머지는 Survivor0/1로 이동한다.
+- Survivor 0 & 1 (Yong Generation)
   - Eden에서 살아남은 데이터가 옮겨지며 공간이 부족해지면 쓸모없는 데이터는 Minor GC에 의해 삭제되고 Old데이터로 보내진다.
+  - 둘중에 하나만 사용되며 데이터가 옮겨질 때마다 0->1 / 1->0 이동한다. 
 - Old ( tenured generation )
   - Young Generation에서 살아남은 객체가 저장되는 곳이다.
   - 굉장히 오래 사용하고 크기가 큰 객체가 대부분이며, Old의 공간이 꽉차면 Major GC가 실행된다. 
@@ -84,7 +85,7 @@ JVM이 시작될 때 실행되고, JVM이 종료되면 해제된다.
 
 ### 1. 스택 영역
 
-메서드를 호출할 때 메서드의 Stack Frame이 저장되는 영여그로, 스택 영역에는 지역변수(local variable, 메소드 내에서 선언된 변수)와 매개변수(parameter, 메소드에 넘겨준 값), 리턴값 등이 저장된다. 
+메서드를 호출할 때 메서드의 Stack Frame이 저장되는 영역으로, 스택 영역에는 지역변수(local variable, 메소드 내에서 선언된 변수)와 매개변수(parameter, 메소드에 넘겨준 값), 리턴값 등이 저장된다. 
 
 기본 자료형 변수는 stack 영역에 저장되며 참조 자료형(기본 자료형 외 모두) 변수는 참조값(주소값)이 저장되어 Heap에 존재하는 실제 데이터를 참조한다.   
 

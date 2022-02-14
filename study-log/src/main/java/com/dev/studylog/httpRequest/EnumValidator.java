@@ -5,20 +5,19 @@ import javax.validation.ConstraintValidatorContext;
 
 public class EnumValidator implements ConstraintValidator<EnumValid, Enum<?>> {
 
-
-    private EnumValid annotaion;
+    private EnumValid enumValid;
 
     @Override
     public void initialize(EnumValid constraintAnnotation) {
-        this.annotaion = constraintAnnotation;
+        enumValid = constraintAnnotation;
     }
 
     @Override
     public boolean isValid(Enum<?> value, ConstraintValidatorContext context) {
         boolean result = true;
-        Object[] enumValues = this.annotaion.enumClass().getEnumConstants();
+        Object[] enumValues = enumValid.enumClass().getEnumConstants();
 
-        if (String.valueOf(value).equals(Color.GREEN.toString())) return false;
+        if (String.valueOf(value).equals(MyColor.GREEN.toString())) return false;
 
         return result;
     }

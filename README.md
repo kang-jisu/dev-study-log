@@ -11,10 +11,13 @@
     - [JDK, JRE, JVM](./background/java/JDK,%20JRE,%20JVM.md)
     - [JVM - Runtime Data Area 및 추가 정리](./background/java/JVM%20-%20Runtime%20Data%20Area%20및%20추가%20정리.md) 
     - [JVM - Heap영역과 Garbage Collector](./background/java/JVM%20-%20Heap영역과%20Garbage%20Collector.md)
+- [String](./background/java/String.md)
+
 #### spring
 
 - [Dto와 Entity](./background/spring/Dto와Entity.md)
 - [컨트롤러가 클라이언트의 요청 데이터를 받아오는 방법](./background/spring/Controller가%20클라이언트의%20요청데이터를%20받아오는%20방법.md)
+- [Validation 유효성 검증](./background/spring/Validation.md)
 
 #### algorithm
 

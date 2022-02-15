@@ -26,7 +26,7 @@ Old Generation 영역으로, 접근 불가능 상태가 되지 않아 Young 영�
 <br/>
 
 ### Young 영역의 구성  
-Young 영역은 3개의 역인 Eden, Survivor0,Survivor1영역으로 나뉜다.
+Young 영역은 3개의 영역인 Eden, Survivor0,Survivor1영역으로 나뉜다.
 - 새로 생성한 대부분의 객체는 Eden 영역에 위치한다.
 - **Eden영역에서 GC가 한 번 발생한 후 살아남은 객체는 Survivor영역중 하나로 이동**된다.
 - Eden영역에서 GC가 발생하면 이미 살아남은 객체가 존재하는 Survivor영역으로 객체가 계속 쌓인다.
@@ -91,7 +91,8 @@ Java GC는 객체가 가비지인지 판별하기 위해서 `reachability`라는
 - 힙 내에 다른 객체에 의한 참조
 - Java 스택, 즉 Java 메서드 실행시 사용하는 변수들에 의한 참조
 - 네이티브 스택에 의해 생성된 객체에 대한 참조
-- 메서드 영역의 정적 변수에 의한 참조
+- 메서드 영역의 정적 변수에 의한 참조  
+
 이때 힙 내에 다른 객체에 의한 참조를 제외한 나머지가 **root set**으로 reachability를 판가름 하는 기준이 된다.  
 <br/>
 root set과 힙 내의 객체를 중심으로 다시 그리면 다음과 같다.
@@ -102,6 +103,6 @@ root set과 힙 내의 객체를 중심으로 다시 그리면 다음과 같다.
 내용이 어려워서 눈으로만 읽으려고 하니 https://d2.naver.com/helloworld/329631 링크 참조.
 <br/>
 ### 정리
-- Java의 GC는 GC 대상 객체를 갖고, 대상 객체를 처리하고, 할당된 메모리를 회수하는 작업으로 구성된다.
+- Java의 GC는 GC 대상 객체를 찾고, 대상 객체를 처리하고, 할당된 메모리를 회수하는 작업으로 구성된다.
 - 애플리케이션은 사용자 코드에서 객체의 reachability를 조절하여 Java GC에 일부 관여할 수 있다.
 - 객체의 reachability를 조절하기 위해서 java.lang.ref 패키지의 SoftReference, WeakReference, PhantomReference, ReferenceQueue 등을 사용한다.

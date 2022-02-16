@@ -1,4 +1,3 @@
-<<정리중>>
 ## OAuth2 연동
 
 - CommondOAuth2Provider ENUM
@@ -19,8 +18,9 @@
     spring:
       config:
         import: classpath:application-security.yml
-        activate:
-          on-profile: default
+      profiles:
+        include:
+          - security
     ```
 
 - 스프링 시큐리티에서는 권한 코드에 항상 `ROLE_`이 앞에 있어야만 한다. 
@@ -46,6 +46,11 @@
 ### 5.3 구글 로그인 연동하기 까지 결과
 
 - [커밋 링크](https://github.com/kang-jisu/Team-auction/commit/5084588ede7dd56fbdf3de951f587febe482f47e)
+
+<details >
+  <summary> 코드 보기 </summary>
+  
+
 
 #### 새로 추가한 파일
 
@@ -132,7 +137,7 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 
 @RequiredArgsConstructor
-@EnableWebSecurity // SpringSecurity설정 활성화
+@EnableWebSecurity // SpringSecurity 설정 활성화
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     private final CustomOAuth2UserService customOAuth2UserService;
@@ -141,11 +146,13 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http
-                .csrf().disable().headers().frameOptions().disable() // h2-console화면 사용하기 위해서
+                .csrf().disable() //-> 로컬에서만
+                .headers().frameOptions().sameOrigin() // h2-console 화면 사용하기 위해서 -> 로컬에서만 해주어야함
                 .and()
                 .authorizeRequests()
-                .antMatchers("/", "/css/**", "/images/**", "/js/**", "/h2-console/**").permitAll()
+                .antMatchers("/", "/h2-console/**", "/js/**", "/css/**", "/image/**", "/fonts/**", "/favicon.ico").permitAll()
                 .antMatchers("/api/v1/**").authenticated()
+                .antMatchers("/admin/**").hasRole("ADMIN")
                 .anyRequest().authenticated()
                 .and()
                 .logout()
@@ -153,7 +160,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .and()
                 .oauth2Login()
                 .userInfoEndpoint() // 로그인 성공 이후 사용자 정보를 가져올 때의 설정 담당
-                .userService(customOAuth2UserService);
+                .userService(customOAuth2UserService)
+                .and()
+                .and().httpBasic();
     }
 }
 
@@ -303,8 +312,6 @@ public class OAuthAttributes {
 ##### auth/dto/SessionUser
 
 ```java
-package com.project.auction.lol.config.auth.dto;
-
 import com.project.auction.lol.domain.user.User;
 import lombok.Getter;
 
@@ -328,39 +335,18 @@ public class SessionUser {
 
 
 
-로그인 성공시
-
-![스크린샷 2022-02-15 오후 11.21.54](/Users/jskang/Desktop/스크린샷 2022-02-15 오후 11.21.54.png)
-
-```java
-Hibernate:     select        user0_.id as id1_2_,        user0_.created_date as created_2_2_,        user0_.modified_date as modified3_2_,        user0_.email as email4_2_,        user0_.name as name5_2_,        user0_.picture as picture6_2_,        user0_.role as role7_2_     from        user user0_     where        user0_.email=?2022-02-15 22:56:42.594 TRACE 79769 --- [nio-8080-exec-3] o.h.type.descriptor.sql.BasicBinder      : binding parameter [1] as [VARCHAR] - [rkdwltn0425@gmail.com]Hibernate:     insert     into        user        (id, created_date, modified_date, email, name, picture, role)     values        (null, ?, ?, ?, ?, ?, ?)2022-02-15 22:56:42.652 TRACE 79769 --- [nio-8080-exec-3] o.h.type.descriptor.sql.BasicBinder      : binding parameter [1] as [TIMESTAMP] - [2022-02-15T22:56:42.626]2022-02-15 22:56:42.653 TRACE 79769 --- [nio-8080-exec-3] o.h.type.descriptor.sql.BasicBinder      : binding parameter [2] as [TIMESTAMP] - [2022-02-15T22:56:42.626]2022-02-15 22:56:42.653 TRACE 79769 --- [nio-8080-exec-3] o.h.type.descriptor.sql.BasicBinder      : binding parameter [3] as [VARCHAR] - [rkdwltn0425@gmail.com]2022-02-15 22:56:42.653 TRACE 79769 --- [nio-8080-exec-3] o.h.type.descriptor.sql.BasicBinder      : binding parameter [4] as [VARCHAR] - [Js Kang]2022-02-15 22:56:42.653 TRACE 79769 --- [nio-8080-exec-3] o.h.type.descriptor.sql.BasicBinder      : binding parameter [5] as [VARCHAR] - [https://lh3.googleusercontent.com/a/AATXAJycO-FgXBylj1D8UL-pz6AcbbykYRjLp152cGaw=s96-c]2022-02-15 22:56:42.653 TRACE 79769 --- [nio-8080-exec-3] o.h.type.descriptor.sql.BasicBinder      : binding parameter [6] as [VARCHAR] - [USER]
-```
+</details>
 
 
 
 
 
-```java
-@Overridepublic OAuth2User loadUser(OAuth2UserRequest userRequest) throws OAuth2AuthenticationException {   Assert.notNull(userRequest, "userRequest cannot be null");   if (!StringUtils         .hasText(userRequest.getClientRegistration().getProviderDetails().getUserInfoEndpoint().getUri())) {      OAuth2Error oauth2Error = new OAuth2Error(MISSING_USER_INFO_URI_ERROR_CODE,            "Missing required UserInfo Uri in UserInfoEndpoint for Client Registration: "                  + userRequest.getClientRegistration().getRegistrationId(),            null);      throw new OAuth2AuthenticationException(oauth2Error, oauth2Error.toString());   }   String userNameAttributeName = userRequest.getClientRegistration().getProviderDetails().getUserInfoEndpoint()         .getUserNameAttributeName();   if (!StringUtils.hasText(userNameAttributeName)) {      OAuth2Error oauth2Error = new OAuth2Error(MISSING_USER_NAME_ATTRIBUTE_ERROR_CODE,            "Missing required \"user name\" attribute name in UserInfoEndpoint for Client Registration: "                  + userRequest.getClientRegistration().getRegistrationId(),            null);      throw new OAuth2AuthenticationException(oauth2Error, oauth2Error.toString());   }   RequestEntity<?> request = this.requestEntityConverter.convert(userRequest);   ResponseEntity<Map<String, Object>> response = getResponse(userRequest, request);   Map<String, Object> userAttributes = response.getBody();   Set<GrantedAuthority> authorities = new LinkedHashSet<>();   authorities.add(new OAuth2UserAuthority(userAttributes));   OAuth2AccessToken token = userRequest.getAccessToken();   for (String authority : token.getScopes()) {      authorities.add(new SimpleGrantedAuthority("SCOPE_" + authority));   }   return new DefaultOAuth2User(authorities, userAttributes, userNameAttributeName);}
-```
+## 네이버 로그인 API정보
 
-![스크린샷 2022-02-15 오후 11.30.34](/Users/jskang/Library/Application Support/typora-user-images/스크린샷 2022-02-15 오후 11.30.34.png)
+<details>
+  <summary> 펼쳐 보기 </summary>
 
-
-
-구글서비스에게 AccessToken을 받고 그 토큰을 이용해서 로그인한 유저에 대한 정보를 받아오는데 성공했다. 
-
-일단 네이버 로그인 마저 구현하고 
-
-이제는 그 로그인한 정보를 가지고 JWT 토큰을 생성해서 , (로그인유저, 식별 토큰?) 클라이언트에게 JWT토큰과 Refresh 토큰을 전달해주고, 서버에는 Refresh토큰을 저장한다.
-
-클라이언트의 요청이 왔을 때마다 JWT토큰 유효성 검사를 하고, 리프레시 토큰갱신 요청이 오면 해주고, 로그아웃하면 리프레시토큰을 지워주는 방식을 구현할 예정이다. 
-
-
-
-### 네이버 로그인 
-
-다음은 네이버 로그인 API에서 사용하는 주요 요청 URL과 메서드, 응답 형식입니다.
+  다음은 네이버 로그인 API에서 사용하는 주요 요청 URL과 메서드, 응답 형식입니다.
 
 |                  요청 URL                  |  메서드  | 응답 형식 |                    설명                    |
 | :----------------------------------------: | :------: | :-------: | :----------------------------------------: |
@@ -376,11 +362,6 @@ Hibernate:     select        user0_.id as id1_2_,        user0_.created_date as 
 - 닉네임 : 20자 이내로 구성된 문자열
 - 프로필 이미지 : 255자 이내로 구성된 URL 형태의 문자열
 - 이메일 주소 : 이메일 규격의 문자열
-- 생일 : 월-일 (MM-DD) 형태의 문자열
-- 연령대 : 연령 구간에 따라 0-9 / 10-19 / 20-29 / 30-39 / 40-49 / 50-59 / 60- 으로 표현된 문자열
-- 성별 : M/F (남성/여성) 으로 표된 문자
-- 출생연도 : 연(YYYY) 형태의 문자열
-- 휴대전화번호 : 대쉬(-)를 포함한 휴대전화번호 문자열
 
 프로필 정보 예시
 
@@ -389,13 +370,6 @@ Hibernate:     select        user0_.id as id1_2_,        user0_.created_date as 
 - 닉네임 : 네이버닉네임
 - 프로필 이미지 : https://phinf.pstatic.net/.../image.jpg
 - 이메일 주소 : naveridlogin@naver.com
-- 생일 : 08-15
-- 연령대 : 20-29
-- 성별 : F
-- 출생연도 : 1900
-- 휴대전화번호 : 010-0000-0000
-
-
 
 ### 3.3.2 로그인한 회원의 네이버 로그인 사용 여부 
 
@@ -607,46 +581,61 @@ https://nid.naver.com/oauth2.0/token?grant_type=delete&client_id=CLIENT_ID&clien
 
 
 
-```bash
-Hibernate: 
-    select
-        user0_.id as id1_2_,
-        user0_.created_date as created_2_2_,
-        user0_.modified_date as modified3_2_,
-        user0_.email as email4_2_,
-        user0_.name as name5_2_,
-        user0_.picture as picture6_2_,
-        user0_.role as role7_2_ 
-    from
-        user user0_ 
-    where
-        user0_.email=?
-2022-02-16 00:08:51.058 TRACE 80771 --- [nio-8080-exec-2] o.h.type.descriptor.sql.BasicBinder      : binding parameter [1] as [VARCHAR] - [w97ww@naver.com]
-Hibernate: 
-    insert 
-    into
-        user
-        (id, created_date, modified_date, email, name, picture, role) 
-    values
-        (null, ?, ?, ?, ?, ?, ?)
-2022-02-16 00:08:51.114 TRACE 80771 --- [nio-8080-exec-2] o.h.type.descriptor.sql.BasicBinder      : binding parameter [1] as [TIMESTAMP] - [2022-02-16T00:08:51.092]
-2022-02-16 00:08:51.117 TRACE 80771 --- [nio-8080-exec-2] o.h.type.descriptor.sql.BasicBinder      : binding parameter [2] as [TIMESTAMP] - [2022-02-16T00:08:51.092]
-2022-02-16 00:08:51.117 TRACE 80771 --- [nio-8080-exec-2] o.h.type.descriptor.sql.BasicBinder      : binding parameter [3] as [VARCHAR] - [w97ww@naver.com]
-2022-02-16 00:08:51.117 TRACE 80771 --- [nio-8080-exec-2] o.h.type.descriptor.sql.BasicBinder      : binding parameter [4] as [VARCHAR] - [강지수]
-2022-02-16 00:08:51.117 TRACE 80771 --- [nio-8080-exec-2] o.h.type.descriptor.sql.BasicBinder      : binding parameter [5] as [VARCHAR] - [https://phinf.pstatic.net/contact/20200107_76/1578377707498w4EPo_PNG/profileImage.png]
-2022-02-16 00:08:51.117 TRACE 80771 --- [nio-8080-exec-2] o.h.type.descriptor.sql.BasicBinder      : binding parameter [6] as [VARCHAR] - [USER]
-
-```
+</details>
 
 
 
+## 로그인 연동 디버깅 
+
+1. 로그인 성공시 일단은 디비에 저장하도록 했다.
+
+![image](./image/oauth1-1.png)
+
+<br/>
+
+2. 구글로 authentication code를 얻어내는 요청을 보내면 userRequest가 이렇게 채워져서 리다이렉트로 온다. 
+   <img src="./image/oauth1-2.png" alt="image" style="zoom:33%;" />
+
+   <img src="./image/oauth1-5.png" alt="image" style="zoom: 33%;" />
+
+   1. registrationId : google
+   2. providerDetails가 구글은 자동으로 생성된다. -> 네이버같은건 안돼서 properties에 추가해준것
+   3. accessToken을 발급받았는데 이걸 담아서 다시 유저정보를 얻는 요청을 구글한테 날리는것같다. 
+      1. GET https://www.googleapis.com/ouath2/v3/userinfo 여기로 
+
+<br/>
+
+3. convert함수에서 userRequest를 가지고 userInfo를 요청하는 새로운 request를 만들어준다-> securit oauth에 구현되어있음 
+
+<img src="./image/oauth1-6.png" width="600"/>
+
+<br/>
+
+4. 요청에 대한 응답에 유저 정보가 다며온다. sub안에 고유 코드가 들어있고 (네이버는 다름) 유저정보가 있다. 이거로 jwt토큰을 만들거나 개별적인 회원가입에 대한 정보로 사용하면 된다. 
+
+<img src="./image/oauth1-7.png" width="600"/>
+
+5. authrities에는 User Entity만들때 Role을 "USER"로 미리 입력해줘서 그대로 생성되었고 나중에 scope에 있는 값으로 authorities가 더 채워진다. 
+
+<img src="./image/oauth1-8.png" width="600"/>
+
+<img src="./image/oauth1-10.png" width="600"/>
+
+6. 이건 네이버 로그인. authorization code 를 이용해 요청한 userinfo response로 id와 여러 값들을 받게된다. 
+
+<img src="./image/oauth1-12.png" width="600"/>
+
+<img src="./image/oauth1-13.png" />
 
 
-Security 적용으로 테스트코드 실패하는 문제 해결
 
-- Gradle - Tasks - verification - test 에러메세지 
+<br/>
 
-```bash
-Caused by: org.springframework.beans.factory.NoSuchBeanDefinitionException: No qualifying bean of type 'com.project.auction.lol.config.auth.CustomOAuth2UserService' available: expected at least 1 bean which qualifies as autowire candidate. Dependency annotations: {}
-```
+구글,네이버에게  AccessToken을 받고 그 토큰을 이용해서 로그인한 유저에 대한 정보를 받아오는데 성공했다.   
+
+이제는 그 로그인한 정보를 가지고 JWT 토큰을 생성해서 , (로그인유저, 식별 토큰?) 클라이언트에게 JWT토큰과 Refresh 토큰을 전달해주고, 서버에는 Refresh토큰을 저장한다.
+
+클라이언트의 요청이 왔을 때마다 JWT토큰 유효성 검사를 하고, 리프레시 토큰갱신 요청이 오면 해주고, 로그아웃하면 리프레시토큰을 지워주는 방식을 구현할 예정이다. 
+
+
 

@@ -5,7 +5,6 @@
 ### background
 
 #### java
-
 - [메소드 참조, 정적메소드](./background/java/정적메소드.md)
 - [JVM Internal - naver d2 읽고 정리](./background/java/JVM%20-%20%5Bnaver%20d2%5D%20Jvm%20Internal%20정리.md)
     - [JDK, JRE, JVM](./background/java/JDK,%20JRE,%20JVM.md)
@@ -22,6 +21,7 @@
 #### algorithm
 
 - [BinarySearch](./background/algorithm/BinarySearch.md)
+- [MergeSort](./background/algorithm/MergeSort.md)
 
-#### book
+#### book 
 - [book](./background/book)

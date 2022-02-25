@@ -121,3 +121,56 @@ class Rectangle{
 ### 스스로 자신의 데이터를 책임지는 객체
 
 다시 수정 ! 
+결합도 측면에서 ReservationAgency의 의존성이 몰려있던 것이 개선되긴 했다. 
+
+### 하지만 여전히 부족하다
+```java
+public class DiscountCondition {
+  public boolean isDiscountable(DayOfWeek dayOfWeek, LocalTime time) {
+    if (type != DiscountConditionType.PERIOD) {
+      throw new IllegalArgumentException();
+    }
+    return this.dayOfWeek.equals(dayOfWeek) &&
+            this.startTime.compareTo(time) <= 0 &&
+            this.endTime.compareTo(time) >= 0;
+  }
+}
+```
+현재 DiscountCondition 객체 내부에 dayOfWeek, time가 포함되어있다는 것을 인터페이스를 통해 외부에 노출하고 있다.  
+또한 setType은 없지만 getType메서드를 통해 type을 포함하고 있음을 노출시키고 있다.  
+DiscountCondition을 수정하게 되면 isDiscountable의 파라미터를 수정하고 해당 메서드를 사용하는 클라이언트도 수정해야할 것이다.   
+
+movie 또한 내부에 amount, percent, none 정책이 있다는 것을 드러내고 있다.  
+
+### 높은 결합도
+```java
+public class Movie{
+  public boolean isDiscountable(LocalDateTime whenScreend, int sequence) {
+    for (DiscountCondition condition : discountConditions) {
+      if (condition.getType() == DiscountConditionType.PERIOD) {
+        if (condition.isDiscountable(whenScreend.getDayOfWeek(), whenScreend.toLocalTime())) {
+          return true;
+        }
+      } else {
+        if (condition.isDiscountable(sequence)) {
+          return true;
+        }
+      }
+    }
+    return false;
+  }
+
+}
+```
+- dicsountCondition 조건 명칭이 변경된다면 movie를 수정해야한다.
+- 추가나 삭제된다면 movie의 if else문이 변경되어야한다. 
+- discountCondition 만족여부를 판단하는데 필요한 정보가 변경된다면 파라미터를 변경해야한다.  
+
+### 낮은 응집도
+screening 
+### 데이터 중심 설계는 객체를 고립시킨 채 오퍼레이션을 정의하도록 만든다. 
+
+데이터 중심 설계는 행동보다 데이터를 먼저 결정하고, 협력이라는 문맥을 벗어나 고립된 객체의 상태에 초점을 맞추기 때문에 캡슐화를 위반하기 쉽고, 요소들 사이에 결합도가 높아지며, 
+코드를 변경하기 어려워진다.   
+
+-> 5장에서는 해결방법을 알아본다. 

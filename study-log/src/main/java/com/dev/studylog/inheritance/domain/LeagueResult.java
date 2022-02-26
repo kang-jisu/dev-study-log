@@ -1,11 +1,14 @@
-package com.dev.studylog.mappedsuperclass.domain;
+package com.dev.studylog.inheritance.domain;
 
+import lombok.Getter;
 import lombok.Setter;
 
 import javax.persistence.*;
 
 @Entity
 @Setter
+@Getter
+@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 abstract public class LeagueResult {
 
     @Id
@@ -19,7 +22,7 @@ abstract public class LeagueResult {
     private Long ranking;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "member_id")
+    @JoinColumn(name = "mayo_id")
     private Member member;
-
 }
+

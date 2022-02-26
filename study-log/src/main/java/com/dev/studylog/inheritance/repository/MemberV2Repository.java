@@ -1,6 +1,6 @@
-package com.dev.studylog.mappedsuperclass.repository;
+package com.dev.studylog.inheritance.repository;
 
-import com.dev.studylog.mappedsuperclass.domain.MemberV2;
+import com.dev.studylog.inheritance.domain.MemberV2;
 import org.springframework.stereotype.Repository;
 
 @Repository

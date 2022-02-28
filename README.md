@@ -4,6 +4,8 @@
 
 ### background
 
+- [알쓸신잡 - 지나가다 안 새로운 내용 가볍게 정리](./background/알쓸신잡.md)
+
 #### java
 - [메소드 참조, 정적메소드](./background/java/정적메소드.md)
 - [JVM Internal - naver d2 읽고 정리](./background/java/JVM%20-%20%5Bnaver%20d2%5D%20Jvm%20Internal%20정리.md)

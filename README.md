@@ -23,6 +23,9 @@
 - [Dto와 Entity](./background/spring/Dto와Entity.md)
 - [컨트롤러가 클라이언트의 요청 데이터를 받아오는 방법](./background/spring/Controller가%20클라이언트의%20요청데이터를%20받아오는%20방법.md)
 - [Validation 유효성 검증](./background/spring/Validation.md)
+- Security
+  - [Spring Security + OAuth2 - 0.이론](./background/spring/Spring%20Security%20+%20OAuth2%20-%200.%20이론.md)
+  - [Spring Security + OAuth2 - 1.소셜로그인](./background/spring/Spring%20Security%20+%20OAuth2%20-%201.%20소셜로그인%20.md)
 
 #### database
 - [DB 인덱스](./background/database/인덱스.md)

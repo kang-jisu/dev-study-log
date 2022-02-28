@@ -52,7 +52,7 @@
 
 웹 서버는 모든 HTTP 객체에 MIME 타입을 붙인다. 웹 브라우저는 서버로부터 객체를 돌려받을 때, 다룰 수 있는 객체인지 MIME 타입을 통해 확인한다. 
 
-**MIME(Multipurpose Internet Mail Extensions)** 타입 
+**MIME(Multipurpose Internet Mail Extensions)** 타입  
 
 >  원래 각기 다른 전자메일 시스템 사이에서 주고받기 위해 설계된 MIME(Multipurpose Internet Mail Extensions)은 HTTP에서도 멀티미디어 콘텐츠를 기술하고 라벨을 붙이기 위해 채택되었다.  
 
@@ -61,6 +61,8 @@
   - plain ASCII 텍스트 문서  : `text/plain`
   - JPEG, GIF 이미지 : `image/jpeg`, `image/gif`
   - 비디오, PPT 파일 등  : `video/quicktime`, `application/vnd.ms-powerpoint`  
+
+<br/>
 
 #### 부록 내용 정리
 
@@ -131,7 +133,7 @@ Accept: image/gif
     Content-Type: text/plain
     
     Simple file.
-    -----------------------------8721656041911415653955004498--
+    -----------------------------8721656041911415653955004498-- <- boundary끝은 --로 끝남
     ```
 
     
@@ -399,3 +401,99 @@ HTTP 터널을 활용하는 대표적인 예로, 암호화된 SSL 트래픽을 H
 
 - 웹 브라우저 
 - 스파이더, 웹 로봇 (검색엔진) 등 
+
+
+
+---
+
+<div id="mime"></div>
+
+## MIME (Multipurpose Internet Mail Extensions)
+
+### 전자우편
+
+- 7비트 ASCII 코드를 사용하여 전송
+- 문자 이외의 바이너리 데이터(이미지, 동영상, 워드 문서 등)를 전송할 수 없음
+- MIME 사양에 따라 멀티미디어 파일의 데이터를 ASCII 데이터로 변환후 전송
+- **송신측에서 전송 ASCII 데이터가 원래 어떤 형식이었는지 MIME타입을 기록하여 전송하면, 수신측에서는 해당 MIME 타입을 참고하여 수신한 ASCII 데이터를 원래의 멀티미디어 바이너리 파일로 변환하여 해석한다.** 
+- 이렇게해서 인터넷 메일의 한계를 극복하며, 여러가지 타입의 데이터를 주고받을 수 있게 되었다.
+
+따라서 메세지 헤더와 그 값은 항상 ASCII 문자를 사용해야한다. 
+
+![이미지](https://t1.daumcdn.net/cfile/tistory/997B2D395A7078321D)    
+
+출처 - 티스토리 [[HTTP\] MIME TYPE](https://dololak.tistory.com/130)
+
+### 참고
+
+> application/octet-stream
+
+- 8비트 단위의 바이너리 데이터. 표현할만한 MIME가 없을 경우(알려지지 않은 파일 타입 or .bin, .arc)를 위한 기본값
+- 주의해야함
+
+> multipart/form-data
+
+- HTML form태그안에서 post방식으로 여러 데이터를 함께 전송하는 경우 사용 
+
+> multipart/byteranges
+
+- HTTP 응답에 대한 멀티 파트 타입으로 `206 Partial Content`와 함께 범위응답을 하게 된다. 
+
+- 여러번에 걸쳐 파일을 리턴해줄 것을 요청할 때 사용한다
+
+- ```http
+  HTTP/1.1 206 Partial Content
+  Accept-Ranges: bytes
+  Content-Type: multipart/byteranges; boundary=3d6b6a416f9b5
+  Content-Length: 385
+  
+  --3d6b6a416f9b5
+  Content-Type: text/html
+  Content-Range: bytes 100-200/1270
+  
+  eta http-equiv="Content-type" content="text/html; charset=utf-8" />
+      <meta name="vieport" content
+  --3d6b6a416f9b5
+  Content-Type: text/html
+  Content-Range: bytes 300-400/1270
+  
+  -color: #f0f0f2;
+          margin: 0;
+          padding: 0;
+          font-family: "Open Sans", "Helvetica
+  --3d6b6a416f9b5--
+  ```
+
+- 출처
+  - https://dololak.tistory.com/130
+
+
+
+### MIME 타입 확인하는 java 코드
+
+1. File.probeContentType 확장자를 이용하여 마임타입을 판단 (실제로 파일이 존재하지 않아도)
+
+```bash
+String mimeType = Files.probeContentType(source);
+```
+
+2. URLConnection 확장자를 이용하여 마임타입을 판단 (실제로 파일이 존재하지 않아도)
+
+```bash
+String mimeType = URLConnection.guessContentTypeFromName("D:/sample.txt");
+```
+
+3. MimeTypesFileTypeMap객체 (JDK 6) - 확장자 이용해 결정 , 판단하지 못하면 `application/octet-stream`반환 
+
+```bash
+String mimeType = mimeTypesMap.getContentType("D:/sample.txt");
+```
+
+4. Apache Tika 라이브러리(컨텐츠 분석 툴 킷)  - 확장자가 아닌 실제 파일의 내용을 검사 
+
+```bash
+String mimeType = new Tika().detect(file);
+```
+
+- 출처 티스토리 [자바(Java)로 파일의 마임 타입(MIME Type) 확인하기](https://offbyone.tistory.com/330)
+

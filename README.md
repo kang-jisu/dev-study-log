@@ -11,6 +11,12 @@
     - [JVM - Runtime Data Area 및 추가 정리](./background/java/JVM%20-%20Runtime%20Data%20Area%20및%20추가%20정리.md) 
     - [JVM - Heap영역과 Garbage Collector](./background/java/JVM%20-%20Heap영역과%20Garbage%20Collector.md)
 - [String](./background/java/String.md)
+- [Collection Framework](./background/java/Collection%20Framework.md)
+- [Collection Class - List, Queue](./background/java/Collection%20Class%20-%20List,%20Queue.md)
+- [Colecction Class - Set, Map](./background/java/Collection%20Class%20-%20Set,%20Map.md)
+- [HashMap 동작방식 - naver d2읽고 정리](./background/java/%5Bnaver%20d2%5D%20HashMap%20동작방식.md)
+- [Comparable vs Comparator](./background/java/Comparable%20vs%20Comparator.md)
+- [== vs equals vs hashCode](./background/java/==%20vs%20equals%20vs%20hashCode.md)
 
 #### spring
 
@@ -20,6 +26,7 @@
 
 #### database
 - [DB 인덱스](./background/database/인덱스.md)
+- [분산데이터베이스 맛보기](./background/database/분산데이터베이스.md)
 
 #### algorithm
 

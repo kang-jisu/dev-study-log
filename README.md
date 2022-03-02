@@ -32,6 +32,7 @@
 
 #### database
 - [DB 인덱스](./background/database/인덱스.md)
+- [인덱스의 자료구조](./background/database/인덱스의%20자료구조.md)
 - [분산데이터베이스 맛보기](./background/database/분산데이터베이스.md)
 
 #### algorithm

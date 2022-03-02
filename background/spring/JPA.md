@@ -9,7 +9,6 @@
 - [ ] 앞부분 복습하기 (ORM, 영속성 컨텍스트)
 - [ ] Spring Data JPA 와의 비교 
 - [ ] QueryDsl 공부하기 
-- [ ] 동일성 보장의 이점이 실제 프로젝트에서 어떨때 쓰이는지 아직 잘 모르겠음 
 
 
 
@@ -64,7 +63,7 @@ public class SimpleJpaRepository<T, ID> implements JpaRepositoryImplementation<T
 
 ## JPA에서 가장 중요한 2가지 - ORM, 영속성컨텍스트
 
-> 이해된 만킁만 간단하게 쓴거라 제대로 정리된게 아닐 수 있음 
+> 이해된 간단하게 쓴거라 제대로 정리된게 아닐 수 있음 
 
 ### ORM
 

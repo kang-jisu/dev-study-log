@@ -28,6 +28,7 @@
 - Security
   - [Spring Security + OAuth2 - 0.이론](./background/spring/Spring%20Security%20+%20OAuth2%20-%200.%20이론.md)
   - [Spring Security + OAuth2 - 1.소셜로그인](./background/spring/Spring%20Security%20+%20OAuth2%20-%201.%20소셜로그인%20.md)
+  - [Spring Security 기본](./background/spring/Spring%20Security%20기본%20.md)
 - [JPA](./background/spring/JPA.md)
 
 #### database

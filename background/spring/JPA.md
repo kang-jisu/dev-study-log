@@ -16,8 +16,9 @@
 
 1. **내가 여태까지 써왔던 것은 Spring Data Jpa, 강의에서 알려주는건 Hibernate가 구현한 JPA**여서 강의에서는 EntityManger를 직접 호출하고 `em.persist`, `em.flush` `em.find` `em.clear()` 등의 함수를 사용한 것이었다. 나중에 Spring Data JPA 공식문서나 자료를 보면서 강의에서 배운 JPA 인터페이스를 어떻게 한번 더 구현해서 사용하게 해놨는지 정리하면 될 것 같다. 
 2. 1:N 에서 연관관계의 주인은 N이며 N테이블에만 실제로 FK가 들어가 Join이 이루어진다. 
-3. 모든 연관관계는 지연로딩으로 설정해주어야 한다. 즉시로딩(Eager)로 했다가 낭패볼 수 있음. 성능상 한번에 불러와야 할 때 fetch join을 사용한다 `N+1` 문제
+3. 모든 연관관계는 지연로딩으로 설정해주어야 한다. 즉시로딩(Eager)로 했다가 낭패볼 수 있음. 성능상 한번에 불러와야 할 때 fetch join을 사용한다 `N+1` 문제 
 4. 트랜잭션 안에서만 영속성 컨텍스트가 생성되어 엔티티가 관리된다. 
+5. [추가] N+1문제는 Eager,Lazy 시점의 차이가 아니라 연관관계에서 무조건 일어날 수 있는 문제이다, Eager는 그 즉시에 일어나기 때문에 더 위험한 것일 뿐.
 
 
 
@@ -176,3 +177,31 @@ public class SimpleJpaRepository<T, ID> implements JpaRepositoryImplementation<T
   - `select m from member`+`select team ..` 
   - -> ` select m, t from member join ....`
 - 따라서 N+1문제를 해결하려면 Fetch join, 또는 batch Size등을 이용할 수 있을 것이다. 
+
+
+
+---
+
+## Spring Data JPA의 사실과 오해
+
+유튜브 링크 : https://www.youtube.com/watch?v=rYj8PLIE6-k 
+
+- 연관관계 매핑
+  - 사실상 단방향 매핑만으로 연관관계의 매핑은 이미 완료된다.
+  - 대개의 겨우 단방향 매핑이면 충분하다
+  - 일대다 단방향 연관관계 매핑에서 영속성 전이를 사용할 경우 양방향으로 변경 (그렇지 않으면 update쿼리가 추가로나감)
+- Spring Data JPA Repository
+  - 웬만한 CRUD, Paging, Sorting 사용 가능함
+    - Paging과 Slice가 있는데 paging은 total을 조회하기 위해 한번 더 count(*)쿼리를 조회한다.
+    - Slice는 limit+1까지 조회해서 next를 판단한다. 
+    - 레코드가 많을 때 전체 개수가 필요하지 않을때는 Page가 아닌 slice를 사용해 부담을 줄일 수 있다. 
+  - 메서드 이름 규칙을 이용한 쿼리 생성
+  - Join 쿼리 수행 가능 -> Entity내의 필드를 `_`를 이용해서 탐색할 수 있음
+  - 엔티티 뿐 아니라 DTO Projection 지원
+
+## N+1 문제는 EAGER Fetch 전략때문에 발생하는게 아니다.
+
+Eager, Lazy는 하나의 쿼리로 연관관계 엔티티들도 그 즉시 가져오나, 나중에 가져오나의 문제이지 실제 참조가 일어날때는 결국 N+1이 발생하게된다. 
+
+- Fetch join으로 N+1 문제 해결시 흔히 하는 실수
+  - pagination 쿼리에 fetch join을 적용하면 모든 레코드를 가져오는 쿼리가 실행된다. 

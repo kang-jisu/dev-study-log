@@ -71,7 +71,7 @@
 - HEAD : 서버에서 어떤 문서에 대한 헤더만 가져온다. 본문 없음
 - POST : 서버가 처리해야 할 데이터를 보낸다. 본문 "있음"
 - PUT : 서버에 요청 메시지의 본문을 저장한다. 본문 "있음"
-- TRACE : 메시지가 프라시를 거쳐 서버에 도달하는 과정을 추척한다. 본문 없음
+- TRACE : 메시지가 프락시를 거쳐 서버에 도달하는 과정을 추척한다. 본문 없음 -> 거의안씀
 - OPTIONS : 서버가 어떤 메서드를 수행할 수 있는지 확인한다. 본문 없음
 - DELETE : 서버에서 문서를 제거한다. 본문 없음 
 ```
@@ -163,9 +163,11 @@ HTTP/1.1 에서 반드시 구현되어야 한다.
 
 * POST는 서버에 데이터를 보내기 위해 사용하며 PUT은 서버에 있는 리소스에 데이터를 입력하기 위해 사용된다.  
 
-### 3.6 TRACE
+### 3.6 TRACE 
 
 > 클라이언트에게 자신의 요청이 서버에 도달했을 때 어떻게 보이게 되는지 알려준다. 
+>
+> 요즘프록시가 워낙 많아서..이거로 확인할수가없음..거의안씀
 
 - 요청 전송의 마지막 단계에 있는 서버는 자신이 받은 요청 메시지를 본문에 넣어 TRACE 응답을 되돌려준다. 
 
@@ -229,7 +231,7 @@ HTTP/1.1에서 도입되었다.
 | 상태코드 | 사유 구절            | 의미                                                         |
 | -------- | -------------------- | ------------------------------------------------------------ |
 | 300      | `Multiple Chocies`   | - 클라이언트가 동시에 여러 리소스를 가리키는 URL을 요청한 경우 리소스의 목록과 함께 반환 |
-| 301      | `Moved Permanently`  | - 요청한 URL이 옮겨졌을 때 사용 . Location헤더에 현재 리소스가 존재하고 있는 URL을 포함 |
+| 301      | `Moved Permanently`  | - 요청한 URL이 옮겨졌을 때 사용 . Location헤더에 현재 리소스가 존재하고 있는 URL을 포함<br />예) http요청 보냈을 때 https로 301해줌 |
 | 302      | `Found`              | - 301과 같은데 Location에 있는 리소스를 임시로 사용해야한다. 이후의 요청은 원래 URL을 사용해야한다. |
 | 303      | `See Other`          | - 리소스를 다른 URL에서 가져와야 한다. <br />- 주 목적은 POST요청에 대한 응답으로 클라이언트에게 리소스의 위치를 알려주는 것 |
 | 304      | `Not Modified`       | - 클라이언트가 헤더에 `If-Modified-Since`같은 요청을 보냈을 때 최근에 수정되지 않았다면 이 응답을 반환한다. <br />- 엔티티 본문을 가지지 않는다. |
@@ -243,9 +245,9 @@ HTTP/1.1에서 도입되었다.
 | 상태코드  | 사유 구절                       | 의미                                                         |
 | --------- | ------------------------------- | ------------------------------------------------------------ |
 | 400       | `Bad Request`                   | - 클라이언트가 잘못된 요청을 보냈다                          |
-| 401       | `Unauthorized`                  | - 리소스를 얻기 전에 인증이 필요하다                         |
+| 401       | `Unauthorized`                  | - 리소스를 얻기 전에 인증이 필요하다<br />예 : 로그인 전에 요청 |
 | 402       | `Payment Required`              | <나중을 위해 비워둠>                                         |
-| 403       | `Forbidden`                     | - 요청이 서버에 의해 거부되었다.                             |
+| 403       | `Forbidden`                     | - 요청이 서버에 의해 거부되었다. <br />예 : 로그인 후 어드민이 아닌데 권한없는데 요청 , 남의 회원정보 조회 |
 | 404       | `Not Found`                     | - 요청한 URL을 찾을 수 없다.                                 |
 | 405       | `Method Not Allowed`            | - 요청 URL에 대해 지원하지 않는 메서드로 요청했다. <br />- Allow 헤더에 지원하는 메서드를 명시해주어야한다. |
 | 406       | `Not Acceptable`                | - 요청한 리소스가 클라이언트가 명시한 Accept 범주에 없는 경우 |
@@ -260,7 +262,7 @@ HTTP/1.1에서 도입되었다.
 | -------- | ---------------------------- | ------------------------------------------------------------ |
 | 500      | `Internal Server Error`      | - 서버가 요청을 처리할 수 없게 만드는 에러를 만났을 때       |
 | 501      | `Not Implemented`            | - 클라이언트가 서버의 능력을 넘은 요청을 했을 때             |
-| 502      | `Bad Gateway`                | - 응답 연쇄에 있는 다음 링크로 부터 가짜 응답에 맞닥뜨렸을 때 |
+| 502      | `Bad Gateway`                | - 응답 연쇄에 있는 다음 링크로 부터 가짜 응답에 맞닥뜨렸을 때<br />예 : 서버 죽고 nginx 만 살아있을 때 |
 | 503      | `Service Unavaiable`         | - 현재는 서버가 요청을 처리할 수 없지만 나중에는 가능함      |
 | 504      | `Gateway Timeout`            | - timeout이 게이트웨이나 프락시에서 온 응답이다.             |
 | 505      | `Http Version Not Supported` |                                                              |
@@ -284,7 +286,7 @@ HTTP/1.1에서 도입되었다.
     - Client-IP, From, Host, Referer, UA-XX, User-Agent
     - Accept, Accept-Charset, Accept-Encoding, Accept-Language #Accept관련
     - Expect, IF-Match, If-Modified-Since, If-None-Match, If-Range, If-Unmodified-Since, Range # 조건부 요청
-    - Authorization, Cookie # 요청 보안 헤더 
+    - "Authorization", Cookie # 요청 보안 헤더 
     - Max-Forwards, Proxy-Authorization, Proxy-Connection # 프락시 요청 헤더 
     ```
 
@@ -293,8 +295,10 @@ HTTP/1.1에서 도입되었다.
   - ```bash
     - Age, Retry-After, Server, Warning
     - Accept-Ranges, Vary #협상 헤더
-    - Proxy-Authenticate, Set-Cookie, WWW-Authenticate # 응답 보안 헤더 
+    - Proxy-Authenticate, "Set-Cookie" 중요, WWW-Authenticate # 응답 보안 헤더 
     ```
+
+  - set cookie에 보낸거 다음 요청에 cookie헤더에 보내라 
 
 - 엔티티 헤더 : 엔티티 본문에 대한 헤더
 
@@ -305,4 +309,5 @@ HTTP/1.1에서 도입되었다.
     ```
 
 - 확장 헤더 
-
+  - 프록시 헤더는 요즘엔 x-뭐시기 x-Forward-For 이런거 씀
+  - 서버입장에서 프록시 말고 실제 클라이언트 아이피 얻고싶을 때. 

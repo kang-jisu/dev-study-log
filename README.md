@@ -7,6 +7,13 @@
 - [알쓸신잡 - 지나가다 안 새로운 내용 가볍게 정리](./background/알쓸신잡.md)
 
 #### java
+- 자바의 정석
+    - [객체지향 프로그래밍 - 1. 상속](./background/java/객체지향%20프로그래밍%20-%201.%20상속.md)
+    - [객체지향 프로그래밍 - 2. 오버라이딩](./background/java/객체지향%20프로그래밍%20-%202.%20오버라이딩.md)
+    - [객체지향 프로그래밍 - 3. 제어자](./background/java/객체지향%20프로그래밍%20-%203.%20제어자.md)
+    - [객체지향 프로그래밍 - 4. 다형성](./background/java/객체지향%20프로그래밍%20-%204.%20다형성.md)
+    - [객체지향 프로그래밍 - 5. 추상클래스](./background/java/객체지향%20프로그래밍%20-%205.%20추상클래스.md)
+    - [객체지향 프로그래밍 - 6. 인터페이스](./background/java/객체지향%20프로그래밍%20-%206.%20인터페이스.md)
 - [메소드 참조, 정적메소드](./background/java/정적메소드.md)
 - [JVM Internal - naver d2 읽고 정리](./background/java/JVM%20-%20%5Bnaver%20d2%5D%20Jvm%20Internal%20정리.md)
     - [JDK, JRE, JVM](./background/java/JDK,%20JRE,%20JVM.md)
@@ -47,4 +54,3 @@
   - [객체지향의 사실과 오해](./background/book/객체지향의%20사실과%20오해) (O)
   - [코딩 인터뷰 완전 분석](./study-log/src/main/java/com/dev/studylog/codinginterview) (진행중)
   - [오브젝트](./study-log/src/main/java/com/dev/studylog/object) (진행중)
-  

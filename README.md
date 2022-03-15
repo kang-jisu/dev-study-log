@@ -18,6 +18,9 @@
 - [Dto와 Entity](./background/spring/Dto와Entity.md)
 - [컨트롤러가 클라이언트의 요청 데이터를 받아오는 방법](./background/spring/Controller가%20클라이언트의%20요청데이터를%20받아오는%20방법.md)
 - [Validation 유효성 검증](./background/spring/Validation.md)
+- [Spring의 쓰레드 관리 방법](./background/spring/쓰레드%20관리%20방법.md)
+- [Blocking vs Non-Blocking / 동기 vs 비동기](./background/spring/Blocking%20vs%20Non-Blocking.md)
+- [nginx vs apache](./background/spring/nginx%20vs%20apache.md)
 
 #### algorithm
 

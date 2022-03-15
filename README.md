@@ -37,11 +37,16 @@
   - [Spring Security + OAuth2 - 1.소셜로그인](./background/spring/Spring%20Security%20+%20OAuth2%20-%201.%20소셜로그인%20.md)
   - [Spring Security 기본](./background/spring/Spring%20Security%20기본%20.md)
 - [JPA](./background/spring/JPA.md)
+- Web server 관련
+  - [Spring의 쓰레드 관리 방법](./background/spring/쓰레드%20관리%20방법.md)
+  - [Blocking vs Non-Blocking / 동기 vs 비동기](./background/spring/Blocking%20vs%20Non-Blocking.md)
+  - [nginx vs apache](./background/spring/nginx%20vs%20apache.md)
 
 #### database
 - [DB 인덱스](./background/database/인덱스.md)
 - [인덱스의 자료구조](./background/database/인덱스의%20자료구조.md)
 - [분산데이터베이스 맛보기](./background/database/분산데이터베이스.md)
+
 
 #### algorithm
 

@@ -27,6 +27,7 @@ HTTP 완벽 가이드
   - 출처  https://github.com/change-my-uniform/study-http 에서 몇가지 자료 추가함 
 
 ### 6장 프락시
+- [6장 프락시](./CH6.%20프락시.md)
 
 ### 7장 캐시
 ### 8장 통합점: 게이트웨이, 터널, 릴레이

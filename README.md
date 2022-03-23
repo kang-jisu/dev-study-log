@@ -31,16 +31,13 @@
 #### spring
 - [SOLID 원칙](./background/spring/SOLID%20원칙.md)
 - [(아직 공부중) Spring의 특징 - IoC, DI, AOP, .. ](./background/spring/Spring의%20특징.md)  
-<br/>
 - [Dto와 Entity](./background/spring/Dto와Entity.md)
 - [컨트롤러가 클라이언트의 요청 데이터를 받아오는 방법](./background/spring/Controller가%20클라이언트의%20요청데이터를%20받아오는%20방법.md)
 - [Validation 유효성 검증](./background/spring/Validation.md)
-<br/>
 - Security
   - [Spring Security + OAuth2 - 0.이론](./background/spring/Spring%20Security%20+%20OAuth2%20-%200.%20이론.md)
   - [Spring Security + OAuth2 - 1.소셜로그인](./background/spring/Spring%20Security%20+%20OAuth2%20-%201.%20소셜로그인%20.md)
   - [Spring Security 기본](./background/spring/Spring%20Security%20기본%20.md)
-<br/>
 - [JPA](./background/spring/JPA.md)
 - [RestTemplate vs WebClient](./background/spring/RestTemplate%20vs%20WebClient.md)
 - Web server 관련

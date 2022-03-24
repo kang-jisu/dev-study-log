@@ -40,6 +40,7 @@
   - [Spring Security 기본](./background/spring/Spring%20Security%20기본%20.md)
 - [JPA](./background/spring/JPA.md)
 - [RestTemplate vs WebClient](./background/spring/RestTemplate%20vs%20WebClient.md)
+- [REST API](./background/spring/REST%20API.md)
 - Web server 관련
   - [Spring의 쓰레드 관리 방법](./background/spring/쓰레드%20관리%20방법.md)
   - [Blocking vs Non-Blocking / 동기 vs 비동기](./background/spring/Blocking%20vs%20Non-Blocking.md)
@@ -49,6 +50,8 @@
 - [DB 인덱스](./background/database/인덱스.md)
 - [인덱스의 자료구조](./background/database/인덱스의%20자료구조.md)
 - [분산데이터베이스 맛보기](./background/database/분산데이터베이스.md)
+- [NoSQL](./background/database/NoSQL.md)
+- [Redis](./background/database/Redis.md)
 
 #### network
 - [WIP)학교수업노트 옮기기중](./background/network/수업%20정리.md)

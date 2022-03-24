@@ -52,6 +52,9 @@
 
 #### network
 - [WIP)학교수업노트 옮기기중](./background/network/수업%20정리.md)
+- [AWS 기본](./background/network/AWS%20기본.md)
+- [HTTPS](./background/network/HTTPS.md)
+- [Layer 2](./background/network/Layer%202.md)
 
 #### algorithm
 

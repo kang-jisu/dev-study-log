@@ -279,6 +279,7 @@ URL은 리소스를 가지고 있는 장비에 대한 IP주소와 포트번호�
   - IP : 207.200.83.29 , Port: 80
 - http://www.netscape.com:80/index.html
   - www.netscape.com 이라는 도메인 이름 혹은 호스트명을 가지고 있는데, 호스트 명은 IP 주소에 대한 이해하기 쉬운 형태의 별명이다. 호스트명은 도메인 이름 서비스(Domain Name Service, DNS)서버를 통해서 쉽게 IP로 변환될 수 있다. 
+- 이때 DNS서버를 이용해서 가져오는데 DNS서버와의 통신은 UDP로 한다. 
 - port 번호 기본값은 80
 
 > - 웹브라우저는 서버의 URL에서 호스트 명을 추출한다.

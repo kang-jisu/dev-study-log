@@ -7,6 +7,175 @@
 
 
 
+## 프레임워크와 라이브러리
+
+- 프레임워크
+  - 소프트웨어의 특정 문제를 해결하기 위해 상호 협력하는 클래스와 인터페이스 집합 
+  - 뼈대나 기반 구조, IoC개념이 적용된 기술
+  - 전체적인 흐름을 프레임워크가 가지고 있으며 그 안에서 개발자가 필요한 코드를  짜 넣는다. 
+- 라이브러리
+  - 단순히 활용 가능한 도구들의 집합
+  - 사용자가 전체적인 흐름을 만들어 라이브러리를 가져다 씀 
+
+
+
+### zip vs jar vs was
+
+```
+zip : 압축파일
+jar : 클래스 압축 파일, jre환경에서 바로 실행 가능
+war : 사전 정의된 구조를 사용하며 (WEB-INF/web.xml) 실행을 위해 톰캣같은 웹서버나 웹 컨테이너가 필요함
+```
+
+
+
+### Java SE vs EE , EJB
+
+**Java SE (Standard Edition)**
+
+- 순수 자바
+- JVM, JAVA API제공 
+
+**Java EE(Enterprise edition) Spec**
+
+- servlet, jsp, EJB(enterprise Java Beans)
+  - Web, Service용 언어
+- 의존성있는 프로그램이다.
+  - servlet , jsp : web container에 의존성이 있음, web container에서 실행시켜야함 (ex:Tomcat)
+  - EJB : EJB server에 의존성이 있음 
+
+**EJB(Enterprise Java Beans)**
+
+- 기업환경의 시스템을 구현하기 위한 서버측 컴포넌트
+- 종류
+  - 세션 빈 (DB연동이 필요 없음)
+  - 엔티티 빈
+    - 데이터베이스 관리
+  - 메시지 구동 빈
+
+- 출처
+  - https://ko.wikipedia.org/wiki/%EC%97%94%ED%84%B0%ED%94%84%EB%9D%BC%EC%9D%B4%EC%A6%88_%EC%9E%90%EB%B0%94%EB%B9%88%EC%A6%88
+
+### **Servlet**
+
+- CGI의 일종
+- Java를 사용하여 동적으로 웹페이지를 생성하는 서버측 프로그램 
+- Java코드 안에 HTML이 들어감 
+  - `doGet` 메서드 안에 out.print(`<HTML></HTML>`) 
+- 구성
+  - WEB/INF/classes/package/servlet.class
+    - WEB/lib/외부 jar파일
+    - WEB/web.xml 
+- 장점
+  - Java SE와 호환된다 
+  - Thread지원
+- 단점
+  - 느린속도
+  - 웹 디자이너와 개발자간의 업무 구분이 어려움
+  - java클래스 내부에 html, css, js코드가 다 들어감 
+  - 극복하고자 JSP가 나옴
+    - JSP
+      - HTML코드 안에 Java가 들어감 
+      - `<%= request.getParamter %>`등 
+      - mvc1구조 : (servlet(view+controller) + model)
+      - mvc2구조 :servlet(controller ) + view(jsp page) + model(pojo)
+
+### 서블릿 컨테이너(톰캣)
+
+- 서블릿을 관리해주는 프로그램
+- 요청을 받아 응답할 수 있게 웹서버와 소켓을 생성해주고 서블릿을 연동 등 서블릿의 생명주기를 관리해줌
+
+
+
+- 출처
+  - [[Java\] Java EE , Servlet 개념과 정리글](https://ekfqkqhd.tistory.com/entry/Java-Java-EE-Servlet-개념과-정리글)
+
+## Spring framework
+
+스프링은 Spring framework라고 하는것이 정확한 표현이다. 
+
+
+
+- 자바 엔터프라이즈 애플리케이션 개발에 사용되는 애플리케이션 프레임워크 
+- 오픈소스로된 경량 프레임워크
+  - Java EE, EJB와 비교해서 가벼움
+  - POJO 객체 사용
+- 특징
+  - 크기나 부하 측면에서 경량 프레임워크임
+  - 제어의 역행(IoC)기술을 통해 애플리케이션의 느슨한 결합 도모
+    - 제어권이 사용자가 아니라 프레임워크에 있고 필요에 따라 스프링에서 사용자의 코드를 호출함 
+  - 관점지향(AOP) 프로그래밍을 위한 지원
+  - 애플리케이션 객체의 생명주기와 설정을 포함하고 관리하는 컨테이너
+  - DI
+    - 각각의 계층이나 서비스들 간에 의존성이 존재할 경우 프레임워크가 서로 연결시켜줌 
+  - POJO 방식
+    - J2EE프레임워크에 비해 특정 인터페이스를 구현하거나 상속받을 필요 없는 객체를 사용
+
+
+
+엔터프라이즈 시스템은 기술적인 제약조건과 요구사항이 늘어간다. 많은 사용자의 요청을 동시에 처리해야하고 서버의 자원을 효율적으로 사용해야 하고, 기업의 핵심 정보를 처리하기 때문에 보호, 안정성, 확장성 측면에서 뛰어나야한다. 그리고 데이터베이스 연동, 타 시스템과의 연동 등 복잡함이 추가될 수 밖에 없다.
+
+엔터프라이즈 어플리케이션이 구현해야할 핵심 비즈니스 로직의 복잡함이 증가하는데 Spring은 이때 비즈니스 로직과 기술 제약을 분리시켜줌. 그러기 위해서 IoC/DI, AOP, PSA가 사용됨
+
+
+
+## 스프링 핵심 삼각형 IoC/DI , AOP, PSA, POJO
+
+![img](https://media.vlpt.us/images/j_user0719/post/7178c2ca-71e5-44d9-8db6-7bdbf8b3a77f/%E1%84%89%E1%85%B3%E1%84%8F%E1%85%B3%E1%84%85%E1%85%B5%E1%86%AB%E1%84%89%E1%85%A3%E1%86%BA%202021-11-07%20%E1%84%8B%E1%85%A9%E1%84%92%E1%85%AE%204.41.07.png)
+
+스프리링의 핵심 삼각형, 기업용 애플리케이션 개발시 복잡함을 어떻게 해결하는지에 대한 Spring의 핵심
+
+**POJO ( Plain Old Java Object )**
+
+```
+- Java EE등의 중량 프레임워크를 사용하면서 해당 프레임워크에 종속된 자바 객체를 만들게 된것에 반발해서 사용하게 된 용어 
+- 자바 모델이나 기능, 프레임워크 등을 따르지 않는 자바 오브젝트를 지칭하는 말로 쓰이며 스프링 프레임워크는 POJO 방식의 프레임워크이다.
+- 특정 클래스나 인터페이스를 구현하고 확장해야할 필요없고, 특정 애너테이션을 포함해야될 필요가 없음 
+
+- 출처 https://ko.wikipedia.org/wiki/Plain_Old_Java_Object
+```
+
+Plain : 특정 환경, 프레임워크에 종속적이지 않다는 의미
+
+Old Java Object : 는 객체지향 원리에 충실한 클래스형태의 자바 객체
+
+- 특정 인터페이스를 구현하거나, 클래스를 상속하지 않는 일반 자바 객체
+- Java Beans
+  - 기본 생성자를 가짐
+  - private 멤버 변수를 가짐 
+    - getter, setter를 사용해 메서드에 접근
+    - 필요한 이벤트 처리 메서드 포함 
+  - 직렬화 가능해야함 
+  - 패키징 되어야함 
+
+
+
+## PSA (Portable Service Abstraction)
+
+```
+환경의 변화와 세부기술의 관계 없이 일관된 방식으로 기술에 접근할 수 있게 해주는 설계 원칙
+
+복잡한 어떤 기술을 내부에 숨기고 개발자에게 편의성을 제공 
+
+Portable(어느 환경이든) Service(복잡한 기술을) Abstraction(추상화를 사용해) 사용할 수 있다.
+```
+
+- DB에 접근하는 방법은 여러가지가 존재 
+  - Jdbc
+  - ORM ( ex JPA) 
+- 그런데 어떠한 경우라도 @Transactional 어노테이션을 선언하는 것 만으로도 별도의 코드나 추가 없이 트랜잭션 서비스를 사용할 수 있음. 
+
+@Transactional을 사용하면 별도의 트랜잭션 관련 코드 없이 트랜잭션을 이용할 수 있다. 트랜잭션에 대한 공통 코드를 어노테이션이 AOP를 통해 대신 처리해주어 우리가 구현해야할 비즈니스 로직에 집중할 수 있게 해줌. 
+
+@Transactional 어노테이션은 JDBC특화된 DatasouceTransactinalManager, JPA특화된 EntityManager가 사용하는 JPATransactionalManager를 각각 구현하는게 아니라 PlatformTransactionalManager를 만들고 각각이 이걸 구현하도록 만들어서 DI로 주입받아 사용함. 
+
+- 출처
+  - https://ooz.co.kr/170
+  - [velog Spring핵심구조 POJOPSA](https://velog.io/@j_user0719/Spring-%ED%95%B5%EC%8B%AC-%EA%B5%AC%EC%A1%B0-POJOPSA)
+  - [@Transactional의 동작방식(AOP,PSA)](https://cantcoding.tistory.com/88)
+
+
+
 ## IoC (Inversion of Control) 제어의 역전
 
 메소드나 객체의 호출 작업을 개발자가 결정하는 것이 아니라 외부에서 결정되는 것을 의미한다.   
@@ -49,22 +218,16 @@
 >
 > 
 >
-> ## POJO
->
-> Plan Old Java Object 말 그대로 평범한 자바 오브젝트
->
-> 이전에 EJB(Enterprise JavaBeans)는 확장 가능한 재사용 로직을 개발하기위해 사용되었으며 한가지 기능을 위해 복잡한 로직이 과도하게 들어간 단점이 있음. POJO는 getter/setter를 가진 단순 자바 오브젝트를 정의함. 
->
 > ### AOP
 >
 > Aspect Oriented Programming 관점 지향 프로그래밍
 >
 > OOP : 객체지향원칙에 따라 관심사가 같은 것은 데이터를 한곳에 모아 분리하여 결합도를 낮추고 응집도를 높임. 캡슐화,,.. 이러한 과정에서 중복된 코드들이 많아지고 가독성, 유지보수성, 확장성을 떨어트리는데 이것을 보완하기 위해 나옴
-> 핵심 기능과 공통 기능을 분리시켜 핵심 로직에 영향을 끼치지 않게 공통 기능을 끼워넣는 개발 형태. 중복되는 코드 제거. 
->
+>핵심 기능과 공통 기능을 분리시켜 핵심 로직에 영향을 끼치지 않게 공통 기능을 끼워넣는 개발 형태. 중복되는 코드 제거. 
 > 
 >
-> - 출처
+> 
+>- 출처
 >   - https://khj93.tistory.com/entry/Spring-Spring-Framework%EB%9E%80-%EA%B8%B0%EB%B3%B8-%EA%B0%9C%EB%85%90-%ED%95%B5%EC%8B%AC-%EC%A0%95%EB%A6%AC
 
 
@@ -85,5 +248,4 @@
 
 - AppConfig처럼 객체를 생성하고 의존관계를 관리해주는 것을 말함
 
-
-
+ 

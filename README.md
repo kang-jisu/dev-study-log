@@ -47,6 +47,9 @@
   - [Blocking vs Non-Blocking / 동기 vs 비동기](./background/spring/Blocking%20vs%20Non-Blocking.md)
   - [nginx vs apache](./background/spring/nginx%20vs%20apache.md)
 
+#### Operating System
+- [9. 가상메모리](./background/os/9.%20가상메모리.md)
+
 #### database
 - [DB 인덱스](./background/database/인덱스.md)
 - [인덱스의 자료구조](./background/database/인덱스의%20자료구조.md)

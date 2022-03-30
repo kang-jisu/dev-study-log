@@ -56,6 +56,7 @@
 - [분산데이터베이스 맛보기](./background/database/분산데이터베이스.md)
 - [NoSQL](./background/database/NoSQL.md)
 - [Redis](./background/database/Redis.md)
+- [JOIN 연산](./background/database/JOIN.md)
 
 #### network
 - [WIP)학교수업노트 옮기기중](./background/network/수업%20정리.md)

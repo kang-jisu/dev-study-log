@@ -180,6 +180,25 @@ public class SimpleJpaRepository<T, ID> implements JpaRepositoryImplementation<T
 
 
 
+### 영속성 상태
+
+- 비영속 
+  - 영속성 컨텍스트와 전혀 관계 없는 상태
+  - `Member m = new Member();`만 한 상태
+- 영속
+  - 영속성 컨텍스트에 저장된 상태
+  - `em.persist()`
+- 준영속
+  - 영속성 컨텍스트에 저장되어 있다가 분리된 상태
+  - `em.detach()` 또는 DB에서 id로 불러온상태
+- 삭제
+  - 영속성 컨텍스트에서 삭제된상태
+  - `em.remove()`
+
+영속상태가 되면 식별자(`@Id`)로 구분되고 영속성 컨텍스트에 저장된 엔티티는 항상 같은 인스턴스를 반환한다. 수정하면 데이터 값도 수정된다.   
+
+준영속상태의 엔티티들은 `save`가 아닌 merge를 사용해야하며, 또는 FindById로 받아온 후 dirth chekcing으로 수정해야한다. 
+
 ---
 
 ## Spring Data JPA의 사실과 오해

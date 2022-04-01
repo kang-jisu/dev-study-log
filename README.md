@@ -69,6 +69,10 @@
 - [BinarySearch](./background/algorithm/BinarySearch.md)
 - [MergeSort](./background/algorithm/MergeSort.md)
 
+#### git
+- [git commands](./background/git/git%20commands.md)
+- [git branch 전략](./background/git/git%20branch%20전략.md)
+
 #### book 
 - [book](./background/book)
   - [성공과 실패를 결정하는 1%의 네트워크 원리](./background/book/성공과%20실패를%20결정하는%201%25의%20네트워크%20원리)

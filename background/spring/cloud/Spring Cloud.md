@@ -249,7 +249,29 @@ Backing Service, Messaging service, Telemtry(모니터링,진단)
 
 **Service Mesh - 추상적 계층 **
 
-설정정보, 라우팅, 인증, 로드밸런싱, 암호화 등등을 지원
+- 설정정보, 라우팅, 인증, 로드밸런싱, 암호화 등등을 지원
+
+- 서비스간 통신을 추상화하여 빠르고 신뢰할 수 있게 만드는 infrastructure layer
+
+```
+- Service Discovery
+- Circuit Breaking
+- Distributed Tracing
+- Load Balancing
+- Retry and Timeout metrics
+- Dynamic Request Routing
+- TLS 
+```
+
+서버 인스턴스 앞단에 Proxy를 두어 healthcheck, routing 제외, 500에러 내면 제외 등 
+
+ex) istio, envoy
+
+MSA 내부 - mesh한 네트워크이기 때문에 추상화해서 복잡한 내부 네트워크 제어, 추적, URL 경로, 호스트 헤더, API 버전 
+
+Routing Rule, circuit breaker 설정
+
+
 
 
 

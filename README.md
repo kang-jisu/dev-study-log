@@ -27,6 +27,7 @@
 - [Comparable vs Comparator](./background/java/Comparable%20vs%20Comparator.md)
 - [== vs equals vs hashCode](./background/java/==%20vs%20equals%20vs%20hashCode.md)
 - [예외처리](./background/java/예외처리.md)
+- [Call by value vs Call by reference](./background/java/Call%20by%20value%20vs%20Call%20by%20reference.md)
 
 #### spring
 - [SOLID 원칙](./background/spring/SOLID%20원칙.md)

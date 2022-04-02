@@ -46,6 +46,7 @@
   - [Spring의 쓰레드 관리 방법](./background/spring/쓰레드%20관리%20방법.md)
   - [Blocking vs Non-Blocking / 동기 vs 비동기](./background/spring/Blocking%20vs%20Non-Blocking.md)
   - [nginx vs apache](./background/spring/nginx%20vs%20apache.md)
+  - [스프링 빈의 Thread-safe](./background/spring/스프링%20빈의%20Thread-safe.md)
 
 #### Operating System
 - [9. 가상메모리](./background/os/9.%20가상메모리.md)

@@ -432,7 +432,7 @@ User-Agent: <robot-name>
 
 
 
-**Disallow, Allow**  
+**Disallow, Allow**   
 
 User-Agent바로 다음에 오고 어떤 URL경로가 명시적으로 금지, 허용되는지 기술한다.   
 ***robots.txt** URL은 금지되어서는 안된다.*    

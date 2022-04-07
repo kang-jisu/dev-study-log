@@ -3,12 +3,18 @@ package com.dev.studylog.httpRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
+import java.util.List;
 import java.util.Map;
 
+@Validated
 @RestController
 @Slf4j
 public class RequestBodyController {
@@ -86,5 +92,17 @@ public class RequestBodyController {
     public ResponseEntity<RequestBodyDto> requestBodyValid(@Valid @RequestBody RequestBodyDto requestBodyDto ){
 
         return ResponseEntity.ok(requestBodyDto);
+    }
+
+    @GetMapping("/param/list")
+    public ResponseEntity<String> requestParamList(
+            @RequestParam(required = false) List< String> names,
+            @RequestParam(required = false) List< MyColor> colors,
+            @RequestParam(required = false)  List< Long> nums
+    ) {
+        log.info("names: {}", names);
+        log.info("colors: {}", colors);
+        log.info("nums: {}", nums);
+        return ResponseEntity.ok("ok");
     }
 }

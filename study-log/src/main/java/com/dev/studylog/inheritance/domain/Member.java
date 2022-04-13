@@ -6,6 +6,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.MappedSuperclass;
+import java.util.List;
 
 @Data
 @MappedSuperclass
@@ -25,4 +26,5 @@ public abstract class Member {
 
     public abstract void addLeagueResult(LeagueResult leagueResult);
     public abstract void removeLeagueResult(LeagueResult leagueResult);
+    public abstract List<LeagueResult> getLeagueResult();
 }

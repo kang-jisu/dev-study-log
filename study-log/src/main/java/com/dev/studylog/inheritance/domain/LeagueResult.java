@@ -17,4 +17,5 @@ public abstract class LeagueResult {
     private Long ordinalNum;
 
     public abstract void setMember(Member member);
+    public abstract Member getMember();
 }

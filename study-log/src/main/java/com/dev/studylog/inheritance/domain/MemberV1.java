@@ -13,7 +13,7 @@ import java.util.List;
 })
 public class MemberV1 extends Member {
 
-    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "member")
+    @OneToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "member")
     private List<LeagueResultV1> leagueResults = new ArrayList<>();
 
     @Override
@@ -26,5 +26,14 @@ public class MemberV1 extends Member {
     public void removeLeagueResult(LeagueResult leagueResult) {
         this.leagueResults.remove(leagueResult);
         leagueResult.setMember(null);
+    }
+
+    @Override
+    public List<LeagueResult> getLeagueResult() {
+        List<LeagueResult> result = new ArrayList<>();
+        for(LeagueResultV1 leagueResultV1 : leagueResults) {
+            result.add(leagueResultV1);
+        }
+        return result;
     }
 }

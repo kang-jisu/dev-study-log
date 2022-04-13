@@ -9,7 +9,7 @@ import org.springframework.data.repository.query.Param;
 import java.util.Optional;
 
 @NoRepositoryBean
-public interface MemberRepository<T extends Member, ID> extends JpaRepository<T, ID> {
+public interface MemberRepository<T extends Member, Long> extends JpaRepository<T, Long> {
 
     Optional<Member> findBySummonerName(String summonerName);
 }

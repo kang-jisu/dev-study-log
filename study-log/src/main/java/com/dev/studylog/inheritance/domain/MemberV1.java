@@ -1,21 +1,17 @@
 package com.dev.studylog.inheritance.domain;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
 
-import javax.persistence.*;
-import java.util.ArrayList;
-import java.util.List;
+import javax.persistence.AttributeOverride;
+import javax.persistence.AttributeOverrides;
+import javax.persistence.Column;
+import javax.persistence.Entity;
 
-
+@Data
 @Entity
-@Table(name = "members")
-@Setter
-@Getter
+@AttributeOverrides({
+        @AttributeOverride(name = "id", column = @Column(name = "accound_id"))
+})
 public class MemberV1 extends Member {
-
-    private Long accountId;
-    private String currentTier;
-    private String highestTier;
-
+    private String one;
 }

@@ -1,34 +1,51 @@
 package com.dev.studylog.inheritance.service;
 
-import com.dev.studylog.inheritance.domain.LeagueResultV2;
+import com.dev.studylog.inheritance.domain.MemberV1;
 import com.dev.studylog.inheritance.domain.MemberV2;
+import com.dev.studylog.inheritance.repository.MemberRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 @SpringBootTest
-@ExtendWith(SpringExtension.class)
+@DisplayName("다형성 테스트")
 class MemberServiceTest {
     @Autowired
-    private MemberService memberService;
+    @Qualifier("memberV1Repository")
+    MemberRepository memberV1Repository;
+
+    @Autowired
+    @Qualifier("memberV2Repository")
+    MemberRepository memberV2Repository;
+
+    @Autowired
+    @Qualifier("memberV2Service")
+    MemberService memberService;
 
     @Test
-    @DisplayName("V2 entity")
-    public void V2Entity() {
-        MemberV2 memberV2 = new MemberV2();
-        memberV2.setOAuthNickname("123");
-        memberV2.setOAuthId(123L);
-        memberService.saveMember(memberV2);
-        System.out.println(memberV2.getOAuthId());
-        System.out.println(memberV2.getMayoId());
+    @DisplayName("엔티티와 레파지토리가 매핑되는지 테스트")
+    void entityTest() {
+        MemberV1 member1 = new MemberV1();
+        member1.setName("v1");
+        member1.setOne("one");
+        memberV1Repository.save(member1);
 
+        MemberV2 member2 = new MemberV2();
+        member2.setName("v2");
+        member2.setTwo("two");
+        memberV2Repository.save(member2);
+    }
 
-        LeagueResultV2 leagueResult = new LeagueResultV2();
-        leagueResult.setRanking(1L);
-        leagueResult.setOrdinalNum(1L);
+    @Test
+    @DisplayName("서비스와 엔티티가 매핑되는지 테스트")
+    void serviceTest() {
+        MemberV2 member2 = new MemberV2();
+        member2.setName("v2");
+        member2.setTwo("two");
 
+        memberService.insert(member2);
+        memberService.get();
     }
 }

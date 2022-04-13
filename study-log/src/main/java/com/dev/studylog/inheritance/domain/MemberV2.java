@@ -1,21 +1,17 @@
 package com.dev.studylog.inheritance.domain;
 
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
 
+import javax.persistence.AttributeOverride;
+import javax.persistence.AttributeOverrides;
+import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.Table;
 
+@Data
 @Entity
-@Table(name = "members_v2")
-@Setter
-@Getter
+@AttributeOverrides({
+        @AttributeOverride(name = "id", column = @Column(name = "mayo_id"))
+})
 public class MemberV2 extends Member {
-
-    private Long oAuthId;
-    private String oAuthNickname;
-
-    private String puuid;
-    private Integer profileIconId;
-
+    private String two;
 }

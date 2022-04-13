@@ -6,7 +6,7 @@ import javax.persistence.*;
 
 @Data
 @MappedSuperclass
-public class LeagueResult {
+public abstract class LeagueResult {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -15,4 +15,6 @@ public class LeagueResult {
 
     private Long ranking;
     private Long ordinalNum;
+
+    public abstract void setMember(Member member);
 }

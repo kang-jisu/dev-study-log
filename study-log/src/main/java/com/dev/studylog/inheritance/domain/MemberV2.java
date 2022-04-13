@@ -18,4 +18,16 @@ public class MemberV2 extends Member {
 
     @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "member")
     private List<LeagueResultV2> leagueResults = new ArrayList<>();
+
+    @Override
+    public void addLeagueResult(LeagueResult leagueResult) {
+        this.leagueResults.add((LeagueResultV2) leagueResult);
+        leagueResult.setMember(this);
+    }
+
+    @Override
+    public void removeLeagueResult(LeagueResult leagueResult) {
+        this.leagueResults.remove(leagueResult);
+        leagueResult.setMember(null);
+    }
 }

@@ -2,13 +2,14 @@ package com.dev.studylog.inheritance.domain;
 
 import lombok.Data;
 
-import javax.persistence.*;
-import java.util.ArrayList;
-import java.util.List;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.MappedSuperclass;
 
 @Data
 @MappedSuperclass
-public class Member {
+public abstract class Member {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -22,4 +23,6 @@ public class Member {
     private Long deaths = 0L;
     private Long assists = 0L;
 
+    public abstract void addLeagueResult(LeagueResult leagueResult);
+    public abstract void removeLeagueResult(LeagueResult leagueResult);
 }

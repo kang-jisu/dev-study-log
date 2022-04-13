@@ -14,4 +14,9 @@ public class LeagueResultV1 extends LeagueResult {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "account_id")
     private MemberV1 member;
+
+    @Override
+    public void setMember(Member member) {
+        this.member = (MemberV1) member;
+    }
 }

@@ -9,5 +9,5 @@ import java.util.Optional;
 @NoRepositoryBean
 public interface MemberRepository<T extends Member, ID> extends JpaRepository<T, ID> {
 
-    Optional<Member> findByName(String name);
+    Optional<Member> findBySummonerName(String summonerName);
 }

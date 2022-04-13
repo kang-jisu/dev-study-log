@@ -2,10 +2,9 @@ package com.dev.studylog.inheritance.domain;
 
 import lombok.Data;
 
-import javax.persistence.AttributeOverride;
-import javax.persistence.AttributeOverrides;
-import javax.persistence.Column;
-import javax.persistence.Entity;
+import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.List;
 
 @Data
 @Entity
@@ -13,5 +12,7 @@ import javax.persistence.Entity;
         @AttributeOverride(name = "id", column = @Column(name = "accound_id"))
 })
 public class MemberV1 extends Member {
-    private String one;
+
+    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true, mappedBy = "member")
+    private List<LeagueResultV1> leagueResults = new ArrayList<>();
 }

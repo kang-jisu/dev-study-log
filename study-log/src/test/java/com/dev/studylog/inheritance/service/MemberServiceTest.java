@@ -29,12 +29,10 @@ class MemberServiceTest {
     void entityTest() {
         MemberV1 member1 = new MemberV1();
         member1.setSummonerName("v1");
-        member1.setOne("one");
         memberV1Repository.save(member1);
 
         MemberV2 member2 = new MemberV2();
         member2.setSummonerName("v2");
-        member2.setTwo("two");
         memberV2Repository.save(member2);
     }
 
@@ -43,7 +41,6 @@ class MemberServiceTest {
     void serviceTest() {
         MemberV2 member2 = new MemberV2();
         member2.setSummonerName("v2");
-        member2.setTwo("two");
 
         memberService.insert(member2);
         memberService.get();

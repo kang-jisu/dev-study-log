@@ -8,6 +8,4 @@ import java.util.Optional;
 
 @Repository
 public interface MemberV2Repository extends MemberRepository<MemberV2, Long> {
-
-    Optional<Member> findByTwo(String two);
 }

@@ -53,6 +53,7 @@
 #### Cloud
 - [Docker 이미지 크기 줄이기](./background/cloud/Docker%20이미지%20크기%20줄이기.md)
 - [Kubernetes Stateful Application](./background/cloud/kubernetes%20Stateful%20Application.md)
+- [쿠버네티스 - 1](./background/cloud/쿠버네티스%20-%201.md)
 
 #### Operating System
 - [9. 가상메모리](./background/os/9.%20가상메모리.md)
@@ -66,7 +67,8 @@
 - [JOIN 연산](./background/database/JOIN.md)
 
 #### network
-- [WIP)학교수업노트 옮기기중](./background/network/수업%20정리.md)
+- [수업 정리 - OSI 7](./background/network/수업%20정리.md)
+- [수업 정리 - TCP](./background/network/수업%20정리%20-%20TCP.md)
 - [AWS 기본](./background/network/AWS%20기본.md)
 - [HTTPS](./background/network/HTTPS.md)
 - [Layer 2](./background/network/Layer%202.md)

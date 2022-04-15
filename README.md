@@ -54,6 +54,7 @@
 - [Docker 이미지 크기 줄이기](./background/cloud/Docker%20이미지%20크기%20줄이기.md)
 - [Kubernetes Stateful Application](./background/cloud/kubernetes%20Stateful%20Application.md)
 - [쿠버네티스 - 1](./background/cloud/쿠버네티스%20-%201.md)
+- [ECS](./background/cloud/ECS.md)
 
 #### Operating System
 - [9. 가상메모리](./background/os/9.%20가상메모리.md)

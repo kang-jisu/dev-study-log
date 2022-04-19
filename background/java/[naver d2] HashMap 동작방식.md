@@ -6,13 +6,13 @@
 - 차이점
   - HashMap
     - Java Collection Framework
-    - thread-safe하지 않음
+    - **thread-safe하지 않음**
     - 보조 해시 함수 사용 -> 충돌 덜 발생
       -  `h = 31 * h + val[i]; (= n<<5 -n)`
     - key에 Null값 허용
   - HashTable
     - JDK 1.0부터 있었던 Java의 API
-    - thread-safe
+    - **thread-safe**
     - 보조 해시 함수 사용 X
       - ` index = X.hashCode()%M`
     - key에 Null값 허용하지 않음

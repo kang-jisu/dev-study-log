@@ -33,26 +33,37 @@
 
 
 
-### 미션방식
-
-```
-master(upstream공통 저장소/master브랜치)
-
-develop(upstream/id브랜치)
-
-기능구현(feature)가 origin/step1, local/step1브랜치
-
-origin은 fork한거, local은 컴퓨터에 받아온거 
-```
-
-- develop 브랜치에서 개발해야할 feature브랜치를 만든다.
-  - upstream/본인id에서 origin/step1을 만듦
-- feature에서 만들다가 기능이 완성되면 develop에 merge
-  - local/step1에서 만들다가 완성되면 origin/step1으로 push후 upstream/본인id로 pr요청
-  - 리뷰를 마치면 upstream/본인id 브랜치로 merge
-- master->main으로도 많이 명명
 
 
+![git flow](https://user-images.githubusercontent.com/43775108/125800526-2ea36d8e-6262-4ba5-9ef0-af7845131d85.png)  
+
+git flow는 `feature`, `develop`, `release`, `hotfix`, `master`  5가지의 브랜치를 가진다. 
+
+1. feature
+   1. 기능의 구현을 담당한다
+   2. `feature/{구현기능명}`
+   3. develop브랜치에서 생성되어 develop브랜치로 머지된다
+   4.  머지된 후에는 해당 브랜치를 삭제한다.
+2. develop
+   1. 개발을 진행하는 브랜치
+   2. feature브랜치가 머지될 때 마다 develop 브랜치에 해당 기능이 더해진다.
+   3. develop 브랜치가 배포수준이 되면 release 브랜치로 머지된다. 
+3. release
+   1. 개발된 내용을 배포하기 위해 준비하는 브랜치
+   2. `release-1` 과 같은 방식
+   3. release브랜치에서 충분한 테스트, 버그 검사 및 수정, 배포할 준비가 되면 master로 머지해 배포한다. 
+   4. release브랜치는 develop브랜치에서 생성되며 버그 수정 내용을 develop브랜치에도 반영하고 최종적으로 master브랜치에 머지한다. 
+4. hotfix
+   1. 배포된 소스에서 버그가 발생하면 생성되는 브랜치이다. 
+   2. `matster` 브랜치에서 생성되며 수정이 완료되면 develop, release, master에 모두 수정사항을 반영한다. 
+5. master
+   1. 최종적으로 배포되는 가장 중심의 브랜치
+   2. develop브랜치에서는 개발이 진행되는 와중에도 이전 release내용이 master에 배포되어있다.
+
+
+
+- 출처
+  - 테코블 git 브랜치 전략 https://tecoble.techcourse.co.kr/post/2021-07-15-git-branch/
 
 ### git-flow특징
 

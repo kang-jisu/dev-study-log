@@ -114,3 +114,15 @@ HashMap은 동기화가 이루어지지 않아(중복값인지 구분을 못해�
   - jdm.kr [Hashtable  vs HashMap vs ConcurrentMap](http://jdm.kr/blog/197)
   - [ConcurrentHashMap이란?](https://github.com/wjdrbs96/Today-I-Learn/blob/master/Java/Collection/Concurrent/ConcurrentHashMap%EC%9D%B4%EB%9E%80%3F.md)
     - Baeldung [Collections.synchronizedMap 대 ConcurrentHashMap](https://www.baeldung.com/java-synchronizedmap-vs-concurrenthashmap)
+
+
+
+
+
+### ConcurrentHashMap 동기화 방식 (더 공부하기 )
+
+주요 메서드에 `synchronized`키워드가 선언되어 있지 않다. 단 `Compare and swap` 을 이용하여 새로운 노드를 해시 버킷에 삽입한다. (원자성 보장)
+
+Compare And Swap 알아보기 
+
+- 

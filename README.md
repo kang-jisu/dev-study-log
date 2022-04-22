@@ -96,4 +96,4 @@
 - [Git 사용법](./background/nextstep/-1.%20Git%20사용법.md)
 - [JUnit테스트](./background/nextstep/-2.%20JUnit%20테스트.md)
 - [단축키](./background/nextstep/-3.%20단축키.md)
-- [1. 문자열 덧셈 계산기](./background/nextstep/1-0.%20자동차%20경주%20게임.md)  
+- [1. 자동차 경주 게임](./background/nextstep/1-0.%20자동차%20경주%20게임.md)  

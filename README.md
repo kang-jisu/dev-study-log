@@ -97,4 +97,5 @@
 - [JUnit테스트](./background/nextstep/-2.%20JUnit%20테스트.md)
 - [단축키](./background/nextstep/-3.%20단축키.md)
 - [1. 자동차 경주 게임](./background/nextstep/1-0.%20자동차%20경주%20게임.md)
-- [2. 로또](./background/nextstep/2-0.%20로또.md)  
+- [2. 로또](./background/nextstep/2-0.%20로또.md)
+- [3. 사다리 게임](./background/nextstep/3-0.%20사다리게임.md)

@@ -14,58 +14,58 @@ import static javax.persistence.GenerationType.IDENTITY;
 @Entity
 public class User {
 
-  @Id
-  @GeneratedValue(strategy = IDENTITY)
-  private Long id;
+    @Id
+    @GeneratedValue(strategy = IDENTITY)
+    private Long id;
 
-  @Column(nullable = false)
-  private String name;
+    @Column(nullable = false)
+    private String name;
 
-  private Integer age;
+    private Integer age;
 
-  @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
-  private final List<UserLoanHistory> userLoanHistories = new ArrayList<>();
+    @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+    private final List<UserLoanHistory> userLoanHistories = new ArrayList<>();
 
-  public User() {
+    public User() {
 
-  }
-
-  public User(String name, Integer age) {
-    if (name.isBlank()) {
-      throw new IllegalArgumentException("이름은 비어 있을 수 없습니다");
     }
-    this.name = name;
-    this.age = age;
-  }
 
-  public void updateName(String name) {
-    this.name = name;
-  }
+    public User(String name, Integer age) {
+        if (name.isBlank()) {
+            throw new IllegalArgumentException("이름은 비어 있을 수 없습니다");
+        }
+        this.name = name;
+        this.age = age;
+    }
 
-  public void loanBook(Book book) {
-    this.userLoanHistories.add(new UserLoanHistory(this, book.getName(), false));
-  }
+    public void updateName(String name) {
+        this.name = name;
+    }
 
-  public void returnBook(String bookName) {
-    UserLoanHistory targetHistory = this.userLoanHistories.stream()
-        .filter(history -> history.getBookName().equals(bookName))
-        .findFirst()
-        .orElseThrow();
-    targetHistory.doReturn();
-  }
+    public void loanBook(Book book) {
+        this.userLoanHistories.add(new UserLoanHistory(this, book.getName(), false));
+    }
 
-  @NotNull
-  public String getName() {
-    return name;
-  }
+    public void returnBook(String bookName) {
+        UserLoanHistory targetHistory = this.userLoanHistories.stream()
+                .filter(history -> history.getBookName().equals(bookName))
+                .findFirst()
+                .orElseThrow();
+        targetHistory.doReturn();
+    }
 
-  @Nullable
-  public Integer getAge() {
-    return age;
-  }
+    @NotNull
+    public String getName() {
+        return name;
+    }
 
-  public Long getId() {
-    return id;
-  }
+    @Nullable
+    public Integer getAge() {
+        return age;
+    }
+
+    public Long getId() {
+        return id;
+    }
 
 }

@@ -14,13 +14,14 @@ import org.springframework.boot.test.context.SpringBootTest
 
 @SpringBootTest
 class UserServiceTest @Autowired constructor(
-    private val userRepository: UserRepository,
-    private val userService: UserService,
-){
+        private val userRepository: UserRepository,
+        private val userService: UserService,
+) {
     @AfterEach
     fun clean() {
         userRepository.deleteAll()
     }
+
     @Test
     @DisplayName("유저 저장이 정상 동작한다.")
     fun saveUserTest() {
@@ -48,7 +49,7 @@ class UserServiceTest @Autowired constructor(
         // then
         assertThat(results).hasSize(2)
         assertThat(results).extracting("name") // ["A","B"]
-                .containsExactlyInAnyOrder("A","B")
+                .containsExactlyInAnyOrder("A", "B")
         assertThat(results).extracting("age").containsExactlyInAnyOrder(20, null)
     }
 
@@ -57,7 +58,7 @@ class UserServiceTest @Autowired constructor(
     fun updateUserNameTest() {
         // given
         val savedUser = userRepository.save(User("A", null))
-        val request = UserUpdateRequest(savedUser.id, "B")
+        val request = UserUpdateRequest(savedUser.id!!, "B")
         // when
         userService.updateUserName(request)
         // then
@@ -75,6 +76,7 @@ class UserServiceTest @Autowired constructor(
         // then
         assertThat(userRepository.findAll()).isEmpty()
     }
+
     @Test
     fun deleteUserExceptionTest() {
         assertThrows<IllegalArgumentException> {

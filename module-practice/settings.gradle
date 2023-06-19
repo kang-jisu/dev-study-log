@@ -1,0 +1,5 @@
+rootProject.name = 'module-practice'
+include 'module-a'
+include 'module-b'
+include 'module-c'
+

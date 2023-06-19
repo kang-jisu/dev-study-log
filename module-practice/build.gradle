@@ -1,0 +1,79 @@
+plugins {
+    id 'org.springframework.boot' version '2.7.0'
+    id 'java-library'
+}
+
+repositories {
+    mavenCentral()
+}
+
+// bootJar 작업은 실행가능한 jar 을 생성하려고 시도하기 때문에 이를 위해서는 main 메서드가 필요하다
+// Root 프로젝트는 main 없이 라이브러리 역할을 하는 모듈이므로 false
+bootJar.enabled = false
+
+dependencies {
+    testImplementation platform('org.junit:junit-bom:5.9.1')
+    testImplementation 'org.junit.jupiter:junit-jupiter'
+}
+
+test {
+    useJUnitPlatform()
+}
+
+// 하위 모든 프로젝트 공통 세팅
+// settings.gradle에 include된 프로젝트 전부 관리
+// root project까지 적용시키고 싶은 경우 allprojects로 등록
+subprojects {
+    group 'com.example'
+    version '1.0-SNAPSHOT'
+
+    apply plugin: 'java-library'
+    apply plugin: 'idea'
+    apply plugin: 'org.springframework.boot'
+    // spring boot dependency를 사용하여 사용중인 부트 버전에서 자동으로 의존성을 가져온다.
+    apply plugin: 'io.spring.dependency-management'
+
+    sourceCompatibility = "11"
+    targetCompatibility = "11"
+    compileJava.options.encoding = 'UTF-8'
+
+    repositories {
+        mavenCentral()
+    }
+
+    // 하위 모듈에서 공통으로 사용하는 세팅
+    dependencies {
+        implementation('org.projectlombok:lombok:')
+        annotationProcessor 'org.projectlombok:lombok'
+        annotationProcessor "org.springframework.boot:spring-boot-configuration-processor"
+    }
+
+    test {
+        useJUnitPlatform()
+    }
+}
+
+project(':module-c') {
+    dependencies {
+        implementation('io.misterspex:misterspex-scientist:1.0.0')
+        implementation 'org.springframework.boot:spring-boot-starter-web'
+    }
+}
+
+
+project(':module-b') {
+    dependencies {
+        api project(':module-c')
+        implementation 'org.springframework.boot:spring-boot-starter-web'
+    }
+}
+
+
+project(':module-a') {
+    dependencies {
+        api project(':module-b')
+        implementation 'org.springframework.boot:spring-boot-starter-web'
+    }
+}
+
+

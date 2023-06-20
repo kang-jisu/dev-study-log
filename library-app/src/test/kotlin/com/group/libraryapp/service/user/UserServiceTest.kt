@@ -2,8 +2,12 @@ package com.group.libraryapp.service.user
 
 import com.group.libraryapp.domain.user.User
 import com.group.libraryapp.domain.user.UserRepository
+import com.group.libraryapp.domain.user.loanhistory.UserLoanHistory
+import com.group.libraryapp.domain.user.loanhistory.UserLoanHistoryRepository
+import com.group.libraryapp.domain.user.loanhistory.UserLoanStatus
 import com.group.libraryapp.dto.user.request.UserCreateRequest
 import com.group.libraryapp.dto.user.request.UserUpdateRequest
+import com.group.libraryapp.dto.user.response.UserLoanHistoryResponse
 import org.assertj.core.api.AssertionsForInterfaceTypes.assertThat
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.DisplayName
@@ -16,9 +20,11 @@ import org.springframework.boot.test.context.SpringBootTest
 class UserServiceTest @Autowired constructor(
         private val userRepository: UserRepository,
         private val userService: UserService,
+        private val userLoanHistoryRepository: UserLoanHistoryRepository,
 ) {
     @AfterEach
     fun clean() {
+        println("클린 시작")
         userRepository.deleteAll()
     }
 
@@ -82,5 +88,42 @@ class UserServiceTest @Autowired constructor(
         assertThrows<IllegalArgumentException> {
             userService.deleteUser("A")
         }
+    }
+
+
+    @Test
+    @DisplayName("대출 기록이 없는 유저도 응답에 포함된다.")
+    fun getUserLoanHistoriesTest1() {
+        // given
+        userRepository.save(User("A", null))
+        // when
+        val userLoanHistories = userService.getUserLoanHistories()
+        // then
+        assertThat(userLoanHistories).hasSize(1)
+        assertThat(userLoanHistories[0].name).isEqualTo("A")
+        assertThat(userLoanHistories[0].books).hasSize(0)
+    }
+
+    @Test
+    @DisplayName("대출 기록이 많은 유저의 응답이 정상 동작한다.")
+    fun getUserLoanHistoriesTest2() {
+        // given
+        val savedUser = userRepository.save(User("A", null))
+        userLoanHistoryRepository.saveAll(listOf(
+                UserLoanHistory.fixture(savedUser, "bookA"),
+                UserLoanHistory.fixture(savedUser, "bookB"),
+                UserLoanHistory.fixture(savedUser, "bookC", UserLoanStatus.RETURNED),
+        ))
+        // when
+        val userLoanHistories = userService.getUserLoanHistories()
+
+        // then
+        assertThat(userLoanHistories).hasSize(1)
+        assertThat(userLoanHistories[0].name).isEqualTo("A")
+        assertThat(userLoanHistories[0].books).hasSize(3)
+        assertThat(userLoanHistories[0].books).extracting("name")
+                .containsExactlyInAnyOrder("bookA", "bookB", "bookC")
+        assertThat(userLoanHistories[0].books).extracting("isReturn")
+                .containsExactlyInAnyOrder(false, false, true)
     }
 }

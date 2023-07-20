@@ -1,5 +1,6 @@
 package com.group.libraryapp.config
 
+import com.group.libraryapp.controller.example.DataDeserializer
 import com.querydsl.jpa.impl.JPAQueryFactory
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration

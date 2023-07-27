@@ -1,3 +1,5 @@
+
+
 # 스프링 핵심 원리 고급편
 
 
@@ -170,3 +172,65 @@
 
 ### 로그 추적기 V2 - 파라미터로 동기화 개발
 
+- HelloTraceV2
+  - beginSync에서 traceId를 `beforeTraceId.createNextId()`
+  - beginSync를 사용해 직전 로그의 traceId를 넘겨주면 된다.
+
+```bash
+23:49:06.514 [main] INFO hello.advanced.trace.hellotrace.HelloTraceV2 -- [50fce07c] hello1
+23:49:06.514 [main] INFO hello.advanced.trace.hellotrace.HelloTraceV2 -- [50fce07c] |-->hello2
+23:49:06.514 [main] INFO hello.advanced.trace.hellotrace.HelloTraceV2 -- [50fce07c] |<--hello2 time=0ms
+23:49:06.514 [main] INFO hello.advanced.trace.hellotrace.HelloTraceV2 -- [50fce07c] hello1 time=0ms
+```
+
+```
+23:49:06.496 [main] INFO hello.advanced.trace.hellotrace.HelloTraceV2 -- [e52874a3] hello
+23:49:06.503 [main] INFO hello.advanced.trace.hellotrace.HelloTraceV2 -- [e52874a3] |-->hello
+23:49:06.503 [main] INFO hello.advanced.trace.hellotrace.HelloTraceV2 -- [e52874a3] |<X-hello time=1ms ex=java.lang.IllegalStateException
+23:49:06.503 [main] INFO hello.advanced.trace.hellotrace.HelloTraceV2 -- [e52874a3] hello time=8ms ex=java.lang.IllegalStateException
+
+```
+
+
+
+### 로그 추적기 V2 - 적용
+
+```bash
+2023-07-27T23:54:13.541+09:00  INFO 16773 --- [nio-8080-exec-1] h.a.trace.hellotrace.HelloTraceV2        : [d1efbfae] OrderController.request()
+2023-07-27T23:54:13.542+09:00  INFO 16773 --- [nio-8080-exec-1] h.a.trace.hellotrace.HelloTraceV2        : [d1efbfae] |-->OrderService.orderItem()
+2023-07-27T23:54:13.542+09:00  INFO 16773 --- [nio-8080-exec-1] h.a.trace.hellotrace.HelloTraceV2        : [d1efbfae] |      |-->OrderRepository.save()
+2023-07-27T23:54:14.548+09:00  INFO 16773 --- [nio-8080-exec-1] h.a.trace.hellotrace.HelloTraceV2        : [d1efbfae] |      |<--OrderRepository.save() time=1006ms
+2023-07-27T23:54:14.548+09:00  INFO 16773 --- [nio-8080-exec-1] h.a.trace.hellotrace.HelloTraceV2        : [d1efbfae] |<--OrderService.orderItem() time=1006ms
+2023-07-27T23:54:14.548+09:00  INFO 16773 --- [nio-8080-exec-1] h.a.trace.hellotrace.HelloTraceV2        : [d1efbfae] OrderController.request() time=1007ms
+```
+
+- beginSync에서 createNextId()에서 Id는 유지하고 level만 증가
+
+
+
+```bash
+2023-07-27T23:55:20.558+09:00  INFO 16773 --- [nio-8080-exec-4] h.a.trace.hellotrace.HelloTraceV2        : [491d7012] OrderController.request()
+2023-07-27T23:55:20.558+09:00  INFO 16773 --- [nio-8080-exec-4] h.a.trace.hellotrace.HelloTraceV2        : [491d7012] |-->OrderService.orderItem()
+2023-07-27T23:55:20.558+09:00  INFO 16773 --- [nio-8080-exec-4] h.a.trace.hellotrace.HelloTraceV2        : [491d7012] |      |-->OrderRepository.save()
+2023-07-27T23:55:20.558+09:00  INFO 16773 --- [nio-8080-exec-4] h.a.trace.hellotrace.HelloTraceV2        : [491d7012] |      |<X-OrderRepository.save() time=0ms ex=java.lang.IllegalStateException: 예외 발생!
+2023-07-27T23:55:20.558+09:00  INFO 16773 --- [nio-8080-exec-4] h.a.trace.hellotrace.HelloTraceV2        : [491d7012] |<X-OrderService.orderItem() time=0ms ex=java.lang.IllegalStateException: 예외 발생!
+2023-07-27T23:55:20.558+09:00  INFO 16773 --- [nio-8080-exec-4] h.a.trace.hellotrace.HelloTraceV2        : [491d7012] OrderController.request() time=0ms ex=java.lang.IllegalStateException: 예외 발생!
+```
+
+- 다른 요청에 따라서 TraceId로 구분도 됨
+
+
+
+**정리**
+
+- 모든 요구 사항을 만족했음
+
+**남은 문제**
+
+- TraceId의 동기화를 위해서 모든 파라미터를 다 고쳐야한다.
+- 로그를 처음 시작할때는 `begin()`, 처음이 아닐 때는 `beginSync()` 를 구분해서 호출해야한다.
+- 컨트롤러->서비스 호출이 아니라 서비스를 처음부터 호출하는 경우 파라미터로 넘길 TraceId가 없다.
+
+**대안**
+
+- TraceId 

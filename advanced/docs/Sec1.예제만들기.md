@@ -124,3 +124,49 @@
 
 
 
+
+
+### 로그 추적기 V1 - 적용
+
+- 단순 begin, end 뿐 아니라 `try`, `catch` 구문 등을 추가해주어야함.
+  - TraceStatus를 try catch 바깥에 선언해주어야 하고 
+  - Exception을 다시 던져주어야 한다.
+
+
+
+**Controller, Service, Repository 모두 적용**
+
+```bash
+2023-07-27T23:39:24.542+09:00  INFO 16523 --- [nio-8080-exec-1] h.a.trace.hellotrace.HelloTraceV1        : [6e724e2b] OrderController.request()
+2023-07-27T23:39:24.544+09:00  INFO 16523 --- [nio-8080-exec-1] h.a.trace.hellotrace.HelloTraceV1        : [b3c45ac9] OrderService.orderItem()
+2023-07-27T23:39:24.544+09:00  INFO 16523 --- [nio-8080-exec-1] h.a.trace.hellotrace.HelloTraceV1        : [30b15af7] OrderRepository.save()
+2023-07-27T23:39:25.549+09:00  INFO 16523 --- [nio-8080-exec-1] h.a.trace.hellotrace.HelloTraceV1        : [30b15af7] OrderRepository.save() time=1005ms
+2023-07-27T23:39:25.549+09:00  INFO 16523 --- [nio-8080-exec-1] h.a.trace.hellotrace.HelloTraceV1        : [b3c45ac9] OrderService.orderItem() time=1005ms
+2023-07-27T23:39:25.549+09:00  INFO 16523 --- [nio-8080-exec-1] h.a.trace.hellotrace.HelloTraceV1        : [6e724e2b] OrderController.request() time=1007ms
+```
+
+```bash
+2023-07-27T23:39:55.227+09:00  INFO 16523 --- [nio-8080-exec-2] h.a.trace.hellotrace.HelloTraceV1        : [da9b3627] OrderController.request()
+2023-07-27T23:39:55.227+09:00  INFO 16523 --- [nio-8080-exec-2] h.a.trace.hellotrace.HelloTraceV1        : [1390f9bc] OrderService.orderItem()
+2023-07-27T23:39:55.227+09:00  INFO 16523 --- [nio-8080-exec-2] h.a.trace.hellotrace.HelloTraceV1        : [02f76253] OrderRepository.save()
+2023-07-27T23:39:55.227+09:00  INFO 16523 --- [nio-8080-exec-2] h.a.trace.hellotrace.HelloTraceV1        : [02f76253] OrderRepository.save() time=0ms ex=java.lang.IllegalStateException: 예외 발생!
+2023-07-27T23:39:55.227+09:00  INFO 16523 --- [nio-8080-exec-2] h.a.trace.hellotrace.HelloTraceV1        : [1390f9bc] OrderService.orderItem() time=0ms ex=java.lang.IllegalStateException: 예외 발생!
+2023-07-27T23:39:55.227+09:00  INFO 16523 --- [nio-8080-exec-2] h.a.trace.hellotrace.HelloTraceV1        : [da9b3627] OrderController.request() time=0ms ex=java.lang.IllegalStateException: 예외 발생!
+```
+
+
+
+**미 구현 요구사항**
+
+- 메서드 호출 깊이 표현
+- 같은 HTTP 요청이면 같은 트랜잭션 ID를 남김
+- **로그에 대한 문맥(Context)정보가 필요함**
+
+-> 파라미터로 동기화 해 볼 예정
+
+
+
+----
+
+### 로그 추적기 V2 - 파라미터로 동기화 개발
+

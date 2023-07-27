@@ -79,7 +79,48 @@
   - 트랜잭션 ID와 깊이를 표현하는 level을 묶은 개념
 -  `TraceStatus`
   - 로그를 시작할 때의 상태 정보 - 로그를 종료할 때 사용함
-  - 
+
+
+
+**public method**
+
+- `TraceStatus begin(String message)`
+  - 로그 시작
+  - 로그 메시지를 파라미터로 받아서 시작 로그 출력
+  - 응답 결과로 현재 로그 상태인 TraceStatus 반환
+- `void end(TraceStatus status)`
+  - 로그 정상 종료
+  - 파라미터로 시작 로그의 상태를 전달받아 실행 시간을 계산하고, 종료시에도 시작할 때와 동일한 로그 메시지 출력
+  - 정상 흐름에서 호출
+- `void exception(TraceStatus status, Exception e)`
+  - 로그를 예외 상황으로 종료
+  - `TraceStatus`, `Exception`  정보를 함께 전달 받아서 실행시간, 예외 정보를 포함한 결과 로그를 출력
+  - 예외가 발생했을 때 호출
+
+
+
+**private method**
+
+- `complete(TraceStatus status, Exception e)`
+  - 로그를 남김
+
+
+
+**테스트 코드 작성**
+
+> 이 테스트는 검증하는 코드 없이 콘솔로 확인하기 때문에 제대로된 테스트 코드는 아니다.
+
+```bash
+23:28:13.308 [main] INFO hello.advanced.trace.hellotrace.HelloTraceV1 -- [59417793] hello
+23:28:13.309 [main] INFO hello.advanced.trace.hellotrace.HelloTraceV1 -- [59417793] hello time=1ms
+```
+
+
+
+```bash
+23:28:13.294 [main] INFO hello.advanced.trace.hellotrace.HelloTraceV1 -- [6de8b18a] hello
+23:28:13.299 [main] INFO hello.advanced.trace.hellotrace.HelloTraceV1 -- [6de8b18a] hello time=7ms ex=java.lang.IllegalStateException
+```
 
 
 

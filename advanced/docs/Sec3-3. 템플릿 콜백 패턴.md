@@ -64,3 +64,51 @@
     }
 ```
 
+
+
+### 템플릿 콜백 패턴 - 적용
+
+```java
+package hello.advanced.trace.callback;
+
+import hello.advanced.trace.TraceStatus;
+import hello.advanced.trace.logtrace.LogTrace;
+
+public class TraceTemplate {
+    private final LogTrace trace;
+
+    public TraceTemplate(LogTrace trace) {
+        this.trace = trace;
+    }
+
+    public <T> T execute(String message, TraceCallback<T> callback) {
+        TraceStatus status = null;
+        try {
+            status = trace.begin(message);
+
+            // 로직 호출
+            T result = callback.call();
+
+            trace.end(status);
+            return result;
+        } catch (Exception e) {
+            trace.exception(status, e);
+            throw e;
+        }
+    }
+}
+
+```
+
+- `TraceTemplate` 은 템플릿 역할을 함
+- `execute(..)` 를 보면 `message` 데이터와 콜백인 `TraceCallback callback` 을 전달받는다. 
+- `<T>` 제네릭을 사용했다.
+
+
+
+### 정리
+
+- 변하는 코드 / 변하지 않는 코드
+- 한계 
+  - 로그 추적기를 적용하기 위해서는 원본 코드를 수정해야함
+  - 원본 코드를 손대지 않고 추적기를 적용할 수 있는 방법- 프록시

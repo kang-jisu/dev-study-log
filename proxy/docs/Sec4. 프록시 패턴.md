@@ -289,15 +289,130 @@ public class MessageDecorator implements Component {
 
 프록시를 사용하면 기존 코드를 전혀 수정하지 않고 로그 추적 기능을 도입할 수 있다.
 
-![스크린샷 2023-09-05 오후 11.31.01](/Users/jskang/Library/Application Support/typora-user-images/스크린샷 2023-09-05 오후 11.31.01.png)
+![스크린샷 2023-09-05 오후 11.31.01](./스크린샷%202023-09-05%20오후%2011.31.01.png)
 
 
 
-#### ![스크린샷 2023-09-05 오후 11.31.42](/Users/jskang/Library/Application Support/typora-user-images/스크린샷 2023-09-05 오후 11.31.42.png)
+#### ![스크린샷 2023-09-05 오후 11.31.42](./스크린샷%202023-09-05%20오후%2011.31.42.png)
 
 
 
-![스크린샷 2023-09-05 오후 11.44.13](/Users/jskang/Library/Application Support/typora-user-images/스크린샷 2023-09-05 오후 11.44.13.png)
+![스크린샷 2023-09-05 오후 11.44.13](./스크린샷%202023-09-05%20오후%2011.44.13.png)
 
 
 
+---
+
+### 구체클래스 기반 프록시 - 예제 1
+
+인터페이스가 아니라 구체클래스에 대해서도 프록시 작성이 가능한지
+
+```java
+@Slf4j
+public class ConcreteLogic {
+    public String operation() {
+        log.info("Concrete Logic");
+    }
+}
+```
+
+![스크린샷 2023-09-12 오후 11.32.44](./스크린샷%202023-09-12%20오후%2011.32.44.png)
+
+
+
+### 구체클래스 기반 프록시 - 예제 2
+
+자바의 다형성은 **인터페이스를 구현하든, 클래스를 상속하든, 상위 타입만 맞으면** 다형성이 적용된다. 따라서 인터페이스가 없어도 프록시를 만들 수 있다.
+
+
+
+![스크린샷 2023-09-12 오후 11.35.14](./스크린샷%202023-09-12%20오후%2011.35.14.png)
+
+```java
+    @Test
+    void noProxy() {
+        ConcreteLogic concreteLogic = new ConcreteLogic();
+        ConcreteClient concreteClient = new ConcreteClient(concreteLogic);
+        concreteClient.execute();
+    }
+
+    @Test
+    void addProxy() {
+        ConcreteLogic concreteLogic = new ConcreteLogic();
+        ConcreteLogic timeProxy = new TimeProxy(concreteLogic);
+        ConcreteClient concreteClient = new ConcreteClient(timeProxy);
+        concreteClient.execute();
+    }
+```
+
+```bash
+23:46:55.349 [main] INFO hello.proxy.pureproxy.concreteproxy.code.TimeProxy - TimeDecorator 실행
+23:46:55.352 [main] INFO hello.proxy.pureproxy.concreteproxy.code.ConcreteLogic - Concrete Logic 실행
+23:46:55.352 [main] INFO hello.proxy.pureproxy.concreteproxy.code.TimeProxy - TimeDecorator 종료 resultTime = 0ms
+```
+
+
+
+핵심은 concreateClient생성자에 concreteLogic이 아니라 TimeProxy를 주입하는건데, 이는 다형성에 의해서 가능하다. (상속의 다형성)
+
+
+
+**=> 인터페이스가 없더라도 프록시가 가능하다는 것을 확실하게 알고 넘어가야한다!**
+
+### 구체 클래스 기반 프록시 - 적용
+
+자바에서 상속할 때 super()를 무조건 호출해야하는데 부모클래스에 기본생성자가 없기때문에 , 그리고 프록시라 repository 사용하지 않을거라서 super(null) 해줘야함
+
+```java
+    public OrderServiceConcreteProxy(OrderV2Service target, LogTrace logTrace) {
+        super(null); // 첫번째 줄에는 들어가야함 . 근데 프록시라서 안들어가도됨 -> 이게 프록시 기반의 단점
+        // 이게 없으면 자동으로 super()을 호출하는데 OrderV2Service는 기본생성자가 없음. 오류가 날 것
+        this.target = target;
+        this.logTrace = logTrace;
+    }
+
+    @Override
+    public void orderItem(String itemId) {
+        TraceSt
+```
+
+
+
+### 인터페이스 기반 프록시와 클래스 기반 프록시
+
+**프록시**
+
+프록시를 사용한 덕분에 원본 코드를 전혀 변경하지 않고 V1, V2 애플리케이션에 LogTrace를 적용할 수 있었다.
+
+
+
+**인터페이스 기반 프록시 vs 클래스 기반 프록시**
+
+- 인터페이스가 없어도 클래스 기반으로 프록시를 생성할 수 있다.
+- 클래스 기반 프록시는 해당 클래스에만 적용할 수 있다. 인터페이스 기반 프록시는 인터페이스만 같으면 모든 곳에 적용할 수 있다.
+- 클래스 기반 프록시는 상속을 사용하기 때문에 몇가지 제약이 있다.
+  - 부모 클래스의 생성자를 호출해야 한다.
+  - 클래스에 final 키워드가 붙으면 상속이 불가능하다.
+  - 메서드에 final 키워드가 붙으면 해당 메서드를 오버라이딩 할 수 없다.
+
+이렇게 보면 인터페이스 기반 프록시가 더 좋아보이는데, 인터페이스 기반 프록시는 상속이라는 제약에서 자유롭다. 
+
+인터페이스 기반 프록시의 단점은 인터페이스가 필요하다는 그 자체이다. 
+
+
+
+**결론**
+
+실무에서는 인터페이스,구체 클래스 있는 경우 모두 있다. 두 상황을 모두 대응할 수 있어야 한다.
+
+
+
+**너무 많은 프록시 클래스**
+
+대상 클래스가 100개일 때 프록시 클래스도 100개를 만들어야하는가??
+
+프록시를 하나만 만들어서 모든 곳에 적용할 방법은 없는지. 동적 프록시 기술이 이 문제를 해결해줄 것이다.
+
+
+
+### 정리

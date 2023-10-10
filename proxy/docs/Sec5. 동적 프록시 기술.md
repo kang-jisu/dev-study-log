@@ -125,7 +125,7 @@ public class ReflectionTest {
 
 **정리**
 
-정적인 `target.callA()`, `target.callB()` 코드를 리플렉션을 사용해서 `Method` 라는 메타정보로 추상화했다. 
+정적인 `target.callA()`, `target.callB()` 코드를 리플렉션을 사용해서 `Method` 라는 **메타정보**로 추상화했다. 
 
 
 
@@ -268,7 +268,93 @@ public class TimeInvocationHandler implements InvocationHandler {
 
 
 
-### CGLIB
+### CGLIB(Code Generator Library)
 
-- 인터페이스 없이 바이트코드 조작
-- 
+인터페이스 없이 바이트코드 조작
+
+- CGLIB는 바이트코드를 조작해서 동적으로 클래스를 생성하는 기술을 제공
+- 인터페이스가 없어도 구체 클래스만 가지고 동적 프록시를 만들어냄
+- CGLIB는 원래 외부 라이브러리인데, 스프링 프레임워크가 내부에 포함했다. 
+
+
+
+CGLIB는 `MethodInterceptor` 를 제공한다.
+
+```java
+package org.springframework.cglib.proxy;
+
+public interface MethodInterceptor extends Callback {
+  Object intercept(Object obj, Method method, Object[] args, MethodProxy proxy) throws Throwable;
+}
+```
+
+- `Object result = methodProxy.invoke(target, args);` 
+- methodProxy를 사용하는걸 권장
+
+
+
+
+
+```java
+    @Test
+    void cglib() {
+        ConcreteService target = new ConcreteService();
+
+        Enhancer enhancer = new Enhancer();
+        enhancer.setSuperclass(ConcreteService.class); // 상속받을 부모 클래스 타입 지정
+        enhancer.setCallback(new TimeMethodInterceptor(target));
+        ConcreteService proxy = (ConcreteService) enhancer.create();
+
+        log.info("targetClass={}", target.getClass());
+        log.info("proxyClass={}", proxy.getClass());
+    }
+}
+```
+
+```bash
+00:16:22.239 [main] INFO hello.proxy.cglib.CbligTest - targetClass=class hello.proxy.common.service.ConcreteService
+00:16:22.242 [main] INFO hello.proxy.cglib.CbligTest - proxyClass=class hello.proxy.common.service.ConcreteService$$EnhancerByCGLIB$$25d6b0e3
+
+```
+
+Cglib가 ConcreteService를 상속받아서 EnhancerByCGLIB를 만들어냄
+
+- `대상클래스$$EnhancerByCGLIB$$임의코드`
+
+JDK프록시가 생성한 클래스
+
+- `proxyClass=class com.sun.proxy.$Proxy1`
+
+
+
+- CGLIB 는 `Enhancer` 를  사용해서 프록시를 생성한다.
+
+
+
+JDK프록시는 인터페이스를 구현해서 프록시를 만들고, CGLIB는 구체 클래스를 상속해서 프록시를 만든다.
+
+
+
+![스크린샷 2023-10-11 오전 12.19.34](/Users/jskang/Library/Application Support/typora-user-images/스크린샷 2023-10-11 오전 12.19.34.png)
+
+
+
+#### CGLIB 제약
+
+- 클래스 기반 프록시는 상속을 사용하기 때문에 제약이 있다.
+  - 부모 클래스의 생성자 -> CGLIB는 자식 클래스를 동적으로 생성하기 때문에 기본 생성자가 필요하다
+  - 클래스에 final키워드가 붙으면 상속이 불가능하여 CGLIB 예외
+  - 메서드에 final키워드가 붙으면 메서드오버라이딩 불가 -> 프록시 동작 안함
+
+
+
+
+
+**두 기술 함께 사용할 때** 
+
+- MethodHandler, InvocationHandler 두개 중복으로 만들어서 관리해야할까?
+- 특정 조건에 맞을 때 프록시 로직을 적용하는 기능도 공통으로 제공되길 원할때?
+- 스프링의 ProxyFactory
+
+
+

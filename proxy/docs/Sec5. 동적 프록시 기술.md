@@ -247,3 +247,28 @@ public class TimeInvocationHandler implements InvocationHandler {
 
 
 
+### JDK 동적프록시 적용
+
+**JDK 동적프록시는 인터페이스가 필수**이므로 V1 애플리케이션에만 적용할 수 있다.
+
+
+
+- InvocationHandler 인터페이스를 구현해서 JDK 동적프록시에서 사용
+
+![스크린샷 2023-10-10 오후 11.56.12](/Users/jskang/Library/Application Support/typora-user-images/스크린샷 2023-10-10 오후 11.56.12.png)
+
+
+
+- no log 호출해도 no log가 찍혀버림 (invoke 호출되어버림)
+  - 메서드 이름 필터 추가 
+
+
+
+
+
+
+
+### CGLIB
+
+- 인터페이스 없이 바이트코드 조작
+- 

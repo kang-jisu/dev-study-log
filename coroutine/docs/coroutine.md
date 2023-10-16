@@ -120,3 +120,251 @@ fun printWithThread(str: Any) {
 
 
 
+## 스레드와 코루틴
+
+- 프로세스
+  - 실행되고 있는 프로그램
+- 스레드
+  - 프로세스에 소속되어 여러 코드를 동시에 실행할 수 있게 해줌
+
+
+
+**종속 관계의 개념에서**
+
+- 프로세스와 스레드
+  - 쓰레드는 프로세스에 속해있고, 다른 프로세스로 바꿀 수 없음
+- 쓰레드와 코루틴
+  - 코루틴이 가지고 있는 코드를 쓰레드에 넘겨서 실행
+  - 코루틴의 코드가 실행되려면 쓰레드가 있어야함 
+  - 단, 특정 쓰레드에 종속되어있는건 아니라서 중단되었다가 재개될 때 다른 쓰레드에 배정될 수도 있다. (한 코루틴의 코드가 여러 쓰레드에서 실행될 수 있다.)
+
+
+
+**context switching이 일어날 때**
+
+- 각각의 프로세스는 완전히 독립적인 메모리영역, 모든 메모리 교체
+- 쓰레드는 Heap은 공유하고 Stack은 각각 가지고 있어 프로세스보다 비용이 적다.
+- 동일 쓰레드에서 실행되는 코루틴은 메모리 전부를 공유하고 있어 비용이 가장 적다.
+  - 하나의 쓰레드에서도 동시성 확보 가능
+
+**양보**
+
+- 코루틴은 스스로 양보할 수 있다 (yield) - 비 선점
+- 쓰레드는 OS가 개입해서 쓰레드 실행을 관리한다 - 선점
+
+
+
+## 코루틴 빌더와 Job
+
+코루틴 빌더 : 코루틴을 새로 만드는 함수
+
+
+
+#### **(1) runBlocking**
+
+```kotlin
+fun main(): Unit = runBlocking {
+    
+}
+```
+
+- 새로운 코루틴을 만들고 루틴 세계와 코루틴 세계를 이어준다.
+- runBlocking에 의해서 만들어진 코루틴이나 안에서 만든 코루틴이 **모두 완료될 때 까지 쓰레드를 Block 시킴**
+  - 따라서 main 메서드를 실행시킬때나 테스트코드를 시작할 때 그 특정 테스트코드에서만 사용해주는 것이 좋음.
+
+**예시**
+
+```kotlin
+fun main() {
+    runBlocking {
+        printWithThread("START")
+        launch {
+            delay(2_000L) // 특정 시간만큼 멈춘 후 yield()실행
+            printWithThread("LAUNCH END")
+        }
+    }
+    
+    printWithThread("END")
+}
+
+---
+start
+LAUNCH END 
+END
+```
+
+- delay를 통해 양보를 하더라도, runBlocking과 그 안에있는 launch로 실행한 코루틴을 모두 블락킹하기 때문에 END가 먼저 출력되지 않음
+
+
+
+#### (2) launch
+
+- 새로운 코루틴을 시작하는 코루틴 빌더
+
+- **반환값이 없는** 코루틴 실행
+
+  - launch의 반환 값은 **코루틴을 제어할 수 있는 객체(Job)** 
+
+- ```
+                                            wait children
+      +-----+ start  +--------+ complete   +-------------+  finish  +-----------+
+      | New | -----> | Active | ---------> | Completing  | -------> | Completed |
+      +-----+        +--------+            +-------------+          +-----------+
+                       |  cancel / fail       |
+                       |     +----------------+
+                       |     |
+                       V     V
+                   +------------+                           finish  +-----------+
+                   | Cancelling | --------------------------------> | Cancelled |
+                   +------------+                                   +-----------+
+  
+  ```
+
+
+
+**job 예시** - start
+
+```kotlin
+fun main(): Unit = runBlocking {
+    val job = launch(start = CoroutineStart.LAZY) {
+        printWithThread("Hello launch")
+    }
+    delay(1_000L)
+    job.start()
+}
+```
+
+- start : 시작옵션 (CoroutineStart `LAZY`, `DEFAULT`, `ATOMIC`, `UNDISPATCHED`)
+  - LAZY - 코루틴은 원래 만든 즉시 실행시킬 수 있는데, 명확한 시작 신호를 줄 때 까지 대기하도록 LAZY 설정을 해줌. `job.start()` 로 호출해야 시작됨 
+
+
+
+**job 예시 - cancel**
+
+```kotlin
+fun main(): Unit = runBlocking {
+    val job = launch {
+        (1..5).forEach {
+            printWithThread(it)
+            delay(500)
+        }
+    }
+    delay(1_000L)
+    job.cancel()
+}
+
+---
+[main @coroutine#2] 1
+[main @coroutine#2] 2
+```
+
+
+
+**job 예시 - join**
+
+```kotlin
+
+fun main(): Unit = runBlocking {
+    val job1 = launch {
+        delay(1_000L)
+        printWithThread("job 1")
+    }
+    job1.join() // 코루틴 1이 끝날 때 까지 대기
+
+    val job2 = launch {
+        delay(1_000L)
+        printWithThread("job 2")
+    }
+}
+```
+
+- 코루틴이 완료될 때 까지 대기
+
+
+
+
+
+#### (3) async, Deferred
+
+```kotlin
+fun main(): Unit = runBlocking {
+    val job = async {
+        3 + 5
+    }
+    val await: Int = job.await() // await : async의 결과를 가져오는 함수
+    printWithThread(await)
+}
+```
+
+- launch랑 비슷한데 async안에서 실행한 결과를 반환할 수 있다. (실은 Deferred)
+- Deferred는 Job을 상속받고 있어서 동일한 기능 + `await()` 이 있음 (결과를 가져오는 함수)
+
+
+
+- async를 사용하면 대기가 필요할 때 여러 코루틴을 동시에 시작시켜놓고 대기를 같이 시킨다음, 결과를 한번에 가져오게 할 수 있다.
+- 또한 callback을 이용하지 않고 동기 스타일로 사용할 수 있음
+
+
+
+**await**
+
+```kotlin
+fun main(): Unit = runBlocking {
+    val time = measureTimeMillis {
+        val job1 = async { apiCall1() }
+        val job2 = async { apiCall2() }
+        printWithThread(job1.await() + job2.await())
+    }
+    printWithThread("소요시간 : $time ms")
+}
+
+suspend fun apiCall1(): Int {
+    delay(1_000L)
+    return 1
+}
+suspend fun apiCall2(): Int {
+    delay(1_000L)
+    return 2
+}
+
+//
+[main @coroutine#1] 3
+[main @coroutine#1] 소요시간 : 1027 ms // 2초가 걸리지 않음 
+```
+
+
+
+**async를 이용한 callback 없는 동기식 호출**
+
+```kotlin
+fun main(): Unit = runBlocking {
+    val time = measureTimeMillis {
+        val job1 = async { api1() }
+        val job2 = async { api2(job1.await()) }
+        printWithThread(job2.await())
+    }
+    printWithThread("소요시간 : $time ms")
+}
+
+suspend fun api1(): Int {
+    delay(1_000L)
+    return 1
+}
+suspend fun api2(num: Int): Int {
+    delay(1_000L)
+    return 2 + num
+}
+---
+[main @coroutine#1] 3
+[main @coroutine#1] 소요시간 : 2029 ms
+
+```
+
+- callback패턴을 안써도 한줄한줄 동기식으로 작성할 수 있다. 
+
+
+
+**async 주의사항**
+
+- CoroutineStart.LAZY 옵션을 사용하면 await() 호출시 결과를 계속 기다리게된다. 그래서 앞에꺼가 끝날때까지 기다렸다가 실행함 (위 예제 2초걸림)
+- 그 앞에 start함수 호출하게되면 괜찮음

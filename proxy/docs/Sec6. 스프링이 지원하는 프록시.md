@@ -173,3 +173,266 @@
 
 **스프링 부트는 AOP를 적용할 때 기본적으로 proxyTargetClass=true 로 설정해서 사용한다. 따라서 인터페이스가 있어도 항상 CGLIB를 사용해서 구체 클래스 기반으로 프록시를 생성한다.** 
 
+
+
+### 포인트컷, 어드바이스, 어드바이저
+
+- **포인트컷(Pointcut)** 
+  - 어디에 부가 기능을 적용할지, 어디에 부가 기능을 적용하지 않을지 판단하는 필터링 로직
+  - 클래스와 메서드 이름으로 필터링
+  - 이름 그대로 어떤 포인트에 기능을 적용할지 않을지 잘라서 구분하는 것
+- **어드바이스(Advice)**
+  - 프록시가 호출하는 부가 기능
+- **어드바이저(Advisor)**
+  - 하나의 포인트컷과 하나의 어드바이스를 가지고 있는 것 
+
+
+
+**역할과 책임**
+
+이렇게 구분한 것은 역할과 책임을 명확하게 분리한 것이다.
+
+- 포인트컷은 대상 여부를 확인하는 필터 역할만 담당
+- 어드바이스는 깔끔하게 부가 기능 로직만 담당한다.
+- 둘을 합치면 어드바이저
+
+
+
+### 예제코드 1.  어드바이저
+
+```java
+    @Test
+    void advisorTest1() {
+        ServiceInterface target = new ServiceImpl();
+        ProxyFactory proxyFactory = new ProxyFactory(target);
+
+        proxyFactory.addAdvisor(new DefaultPointcutAdvisor(Pointcut.TRUE, new TimeAdvice()));
+
+        ServiceInterface proxy = (ServiceInterface) proxyFactory.getProxy();
+        proxy.save();
+        proxy.find();
+    }
+```
+
+
+
+![스크린샷 2023-11-07 오후 11.37.09](스크린샷%202023-11-07%20오후%2011.37.09.png)
+
+![스크린샷 2023-11-07 오후 11.37.18](스크린샷%202023-11-07%20오후%2011.37.18.png)
+
+addAdvice하면 어쨌든 advisor가 들어가는 것
+
+
+
+### 예제 코드 2.  직접 만든 포인트 컷
+
+save에는 어드바이스 로직 적용하고, find에는 적용 안하게 구현해볼 것
+
+```java
+public interface Pointcut {
+
+	/**
+	 * Return the ClassFilter for this pointcut.
+	 * @return the ClassFilter (never {@code null})
+	 */
+	ClassFilter getClassFilter();
+
+	/**
+	 * Return the MethodMatcher for this pointcut.
+	 * @return the MethodMatcher (never {@code null})
+	 */
+	MethodMatcher getMethodMatcher();
+
+
+	/**
+	 * Canonical Pointcut instance that always matches.
+	 */
+	Pointcut TRUE = TruePointcut.INSTANCE;
+
+}
+```
+
+스프링에서 제공하는 Pointcut 인터페이스
+
+
+
+```java
+@Test
+    @DisplayName("직접 만든 포인트 컷")
+    void advisorTest2() {
+        ServiceInterface target = new ServiceImpl();
+        ProxyFactory proxyFactory = new ProxyFactory(target);
+
+        proxyFactory.addAdvisor(new DefaultPointcutAdvisor(new MyPointcut(), new TimeAdvice()));
+
+        ServiceInterface proxy = (ServiceInterface) proxyFactory.getProxy();
+        proxy.save();
+        proxy.find();
+    }
+
+    static class MyPointcut implements Pointcut {
+        @Override
+        public ClassFilter getClassFilter() {
+            return ClassFilter.TRUE;
+        }
+
+        @Override
+        public MethodMatcher getMethodMatcher() {
+            return new MyMethodMatcher();
+        }
+    }
+
+    static class MyMethodMatcher implements MethodMatcher {
+        private static String MATCH_NAME = "save";
+        @Override
+        public boolean matches(Method method, Class<?> targetClass) {
+
+            boolean result = method.getName().equals(MATCH_NAME);
+            log.info("포인트컷 호출 method={} targetClass={}", method.getName(), targetClass.getName());
+            log.info("포인트컷 결과 result={}", result);
+            return result;
+        }
+
+        /**
+         * isRuntime이 false인 경우에는 정적 정보만 사용하기 때문에 스프링 내부에서 캐싱을 한다.
+         * @return
+         */
+        @Override
+        public boolean isRuntime() {
+            return false;
+        }
+
+        @Override
+        public boolean matches(Method method, Class<?> targetClass, Object... args) {
+            return false;
+        }
+    }
+```
+
+```bash
+23:44:19.926 [main] INFO hello.proxy.advisor.AdvisorTest - 포인트컷 호출 method=save targetClass=hello.proxy.common.service.ServiceImpl
+23:44:19.930 [main] INFO hello.proxy.advisor.AdvisorTest - 포인트컷 결과 result=true
+23:44:19.934 [main] INFO hello.proxy.common.advice.TimeAdvice - TimeProxy 실행
+23:44:19.934 [main] INFO hello.proxy.common.service.ServiceImpl - save 호출
+23:44:19.934 [main] INFO hello.proxy.common.advice.TimeAdvice - TimeProxy 종료 resultTime = 0
+23:44:19.935 [main] INFO hello.proxy.advisor.AdvisorTest - 포인트컷 호출 method=find targetClass=hello.proxy.common.service.ServiceImpl
+23:44:19.935 [main] INFO hello.proxy.advisor.AdvisorTest - 포인트컷 결과 result=false
+23:44:19.935 [main] INFO hello.proxy.common.service.ServiceImpl - find 호출
+```
+
+
+
+### 스프링이 제공하는 포인트컷
+
+```java
+
+        NameMatchMethodPointcut pointcut = new NameMatchMethodPointcut();
+        pointcut.setMappedNames("save");
+        DefaultPointcutAdvisor advisor = new DefaultPointcutAdvisor(pointcut, new TimeAdvice());
+
+```
+
+- `NameMatchMethodPointcut` : 메서드 이름 기반 매칭
+  - PatternMatchUtils사용해서 ** 이런거 허용
+- `JdkRegexpMethodPointcut`  : JDK 정규표현식 기반 
+- `TruePointcut` : 항상 참을 반환
+- `AnnotationMatchingPointcut` : 애노테이션으로 매칭
+- `AspectJExpressionPointcut` : aspectJ표현식으로 매칭
+  - 실무에서는 이거를 기반으로한걸 제일 많이 씀
+
+
+
+### 여러 어드바이저 함께 적용
+
+ ```java
+     @Test
+     @DisplayName("여러 프록시")
+     void multiAdvisorTest1() {
+         // client -> proxy2(advisor2) -> proxy1(advisor1) -> target
+ 
+         // 프록시1 생성
+         ServiceInterface target = new ServiceImpl();
+         ProxyFactory proxyFactory1 = new ProxyFactory(target);
+         DefaultPointcutAdvisor advisor1 = new DefaultPointcutAdvisor(Pointcut.TRUE, new Advice1());
+         proxyFactory1.addAdvisor(advisor1);
+         ServiceInterface proxy1 = (ServiceInterface) proxyFactory1.getProxy();
+ 
+         // 프록시2 생성, target -> proxy1 입력
+         ProxyFactory proxyFactory2 = new ProxyFactory(proxy1);
+         DefaultPointcutAdvisor advisor2 = new DefaultPointcutAdvisor(Pointcut.TRUE, new Advice2());
+         proxyFactory2.addAdvisor(advisor2);
+         ServiceInterface proxy2 = (ServiceInterface) proxyFactory2.getProxy();
+ 
+         // 실행
+         proxy2.save();
+     }
+ 
+ ```
+
+```bash
+23:55:39.527 [main] INFO hello.proxy.advisor.MutliAdvisorTest$Advice2 - advice2 호출
+23:55:39.529 [main] INFO hello.proxy.advisor.MutliAdvisorTest$Advice1 - advice1 호출
+23:55:39.530 [main] INFO hello.proxy.common.service.ServiceImpl - save 호출
+```
+
+
+
+
+
+![스크린샷 2023-11-07 오후 11.56.12](스크린샷%202023-11-07%20오후%2011.56.12.png)
+
+
+
+=> 적용하려는 advice만큼 프록시를 생성해야함
+
+
+
+
+
+**하나의 프록시, 여러 어드바이저**
+
+```java
+    @Test
+    @DisplayName("하나의 프록시, 여러 어드바이저")
+    void multiAdvisorTest2() {
+        // client -> proxy -> advisor2 -> advisor1 -> target
+
+        DefaultPointcutAdvisor advisor1 = new DefaultPointcutAdvisor(Pointcut.TRUE, new Advice1());
+        DefaultPointcutAdvisor advisor2 = new DefaultPointcutAdvisor(Pointcut.TRUE, new Advice2());
+
+        // 프록시1 생성
+        ServiceInterface target = new ServiceImpl();
+        ProxyFactory proxyFactory = new ProxyFactory(target);
+        proxyFactory.addAdvisor(advisor2);
+        proxyFactory.addAdvisor(advisor1);
+        ServiceInterface proxy2 = (ServiceInterface) proxyFactory.getProxy();
+
+        // 실행
+        proxy2.save();
+    }
+```
+
+addAdvisor로 등록하면 된다.
+
+
+
+- 스프링 AOP를 적용할 때, 최적화를 진행해서 지금처럼 프록시는 하나만 만들고 하나의 프록시에 여러 어드바이저를 적용한다.
+- **정리하면 하나의 target에 여러 AOP를 동시에 적용하더라도, 스프링의 AOP는 target마다 하나의 프록시만 생성한다.** --> 기억하기!
+
+
+
+### 정리
+
+**남은 문제**
+
+1. 너무 많은 설정
+
+Config파일이 너무 많다. 애플리케이션에 스프링 빈이 100개가 있다면 부가기능을 적용하기 위해 100개의 동적프록시생성 코드를 만들어야한다.
+
+프록시 코드에 빈 생성 코드까지 다 넣어야함
+
+2. 컴포넌트 스캔
+
+컴포넌트 스캔을 사용하는 경우 지금까지 학습한 방법으로 프록시 적용이 불가능하다.
+
+-> 이것들을 해결하기 위한 방법이 다음의 빈 후처리기

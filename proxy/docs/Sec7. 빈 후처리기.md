@@ -313,3 +313,17 @@ public class AutoProxyConfig {
     }
 ```
 
+
+
+### 하나의 프록시, ㅇㅕ러 Advisor 적용
+
+프록시 1개 생성해서 만족하는 Advisor를 모두 포함함.
+
+포인트컷을 모두 만족하지 않으면 프록시가 생성되지 않음
+
+
+
+### 정리
+
+Advisor = Pointcut + Advice
+

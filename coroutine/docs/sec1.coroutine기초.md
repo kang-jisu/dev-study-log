@@ -217,7 +217,7 @@ END
                    +------------+                           finish  +-----------+
                    | Cancelling | --------------------------------> | Cancelled |
                    +------------+                                   +-----------+
-  
+    
   ```
 
 
@@ -368,3 +368,259 @@ suspend fun api2(num: Int): Int {
 
 - CoroutineStart.LAZY 옵션을 사용하면 await() 호출시 결과를 계속 기다리게된다. 그래서 앞에꺼가 끝날때까지 기다렸다가 실행함 (위 예제 2초걸림)
 - 그 앞에 start함수 호출하게되면 괜찮음
+
+
+
+### 코루틴의 취소
+
+필요하지 않은 코루틴을 적절히 취소해 컴퓨터 자원을 아껴야 한다.
+
+
+
+#### 취소에 협조하는 방법 1
+
+delay()나 yield()같은 kotlinx.coroutines 패키지의 suspend fun 사용
+
+![스크린샷 2023-12-10 오후 7.22.26](스크린샷%202023-12-10%20오후%207.22.26.png)
+
+
+
+#### 취소에 협조하는 방법2
+
+코루틴 스스로 본인의 상태를 확인해 취소 요청을 받았으면, 
+
+CancellationException을 던지기
+
+```java
+fun main(): Unit = runBlocking {
+    val job = launch(Dispatchers.Default) {
+        var i = 1
+        var nextPrintTime = System.currentTimeMillis()
+        while (i<=5) {
+            if (nextPrintTime <= System.currentTimeMillis()) {
+                printWithThread("${i++}번째 출력!")
+                nextPrintTime += 1_000L
+            }
+            if (!isActive) {
+                // isActive: 코루틴이 launch에 의한 자신의 상태를 확인할 수 있음
+                throw CancellationException()
+            }
+        }
+    }
+    delay(100L)
+    job.cancel()
+}
+```
+
+- isActive: 현재 코루틴이 활성화 되어있는지, 취소 신호를 받았는 확인
+
+- `launch(Dispatchers.Default)`) 로 실행해서 main이 아닌 다른 스레드로 실행되게함
+
+  - 
+
+  
+
+![스크린샷 2023-12-10 오후 7.30.48](스크린샷%202023-12-10%20오후%207.30.48.png)
+
+참고 - https://wooooooak.github.io/kotlin/2020/06/03/Coroutine_Cancellation/
+
+
+
+#### 코루틴이 취소에 협조하는 방법
+
+- kotlinx.coroutines 패키지의 suspend 함수 호출
+- isActive로 CancellationException 던지기
+
+
+
+delay()같은 함수도 내부적으로 CancellationException을 던지고 있어서, try catch로 delay를 잡아버리면 cancel이 수행되지 않음
+
+```kotlin
+fun main(): Unit = runBlocking {
+    val job = launch {
+        try {
+            delay(1_000L)
+        } catch(e: CancellationException) {
+            // 아무것도 안함
+        }
+        printWithThread("delay에 의해 취소되지 않았다")
+    }
+    delay(100L)
+    printWithThread("취소 시작")
+    job.cancel()
+}
+```
+
+
+
+### 코루틴의 예외 처리와 Job의 상태 변화
+
+![스크린샷 2023-12-10 오후 7.45.05](스크린샷%202023-12-10%20오후%207.45.05.png)
+
+- runBlocking으로 만들어진 최 상단의 코루틴을 root 코루틴이라고 한다.
+
+
+
+새로운 루트 코루틴을  만들고 싶을 땐 새로운 영역(CoroutineScope)를 만들어야한다.
+
+
+
+
+
+```kotlin
+// as-is
+fun main(): Unit = runBlocking { 
+    val job1 = launch {
+        delay(1_000L)
+        printWithThread("Job 1 ")
+    }
+    val job2 = launch {
+        delay(1_000L)
+        printWithThread("Job 1 ")
+    }
+}
+
+// to-be (with CourotineScope(Dispatchers.Default))
+fun main(): Unit = runBlocking {
+    val job1 = CoroutineScope(Dispatchers.Default).launch {
+        delay(1_000L)
+        printWithThread("Job 1 ")
+    }
+    val job2 = CoroutineScope(Dispatchers.Default).launch {
+        delay(1_000L)
+        printWithThread("Job 1 ")
+    }
+}
+```
+
+Dispatchers.Default (main쓰레드가 아닌 다른 쓰레드)에서 실행시키는 새로운 코루틴 영역을 만들어서 launch로 실행시킴
+
+각각이 루트 코루틴이 됨
+
+
+
+**launch**
+
+```kotlin
+fun main(): Unit = runBlocking {
+    val job = CoroutineScope(Dispatchers.Default).launch {
+        throw IllegalArgumentException()
+    }
+    delay(1_000L)
+}
+
+////
+Exception in thread "DefaultDispatcher-worker-1" java.lang.IllegalArgumentException
+	at Lec05Kt$main$1$job$1.invokeSuspend(Lec05.kt:8)
+```
+
+**async**
+
+```kotlin
+fun main(): Unit = runBlocking {
+    val job = CoroutineScope(Dispatchers.Default).async {
+        throw IllegalArgumentException()
+    }
+    delay(1_000L)
+    job.await()
+}
+////
+Exception in thread "main" java.lang.IllegalArgumentException
+	at Lec05Kt$main$1$job$1.invokeSuspend(Lec05.kt:8)
+```
+
+**launch와 async 예외 발생 차이**
+
+- launch는 안에서 예외가 발생하면 예외를 터뜨리고 종료됨
+- async: 예외가 발생해도 예외를 출력하지 않고 예외를 확인하려면 await이 필용한데, 이거는 출력하는 쓰레드에서 발생된 에러로 봄
+
+
+
+**runBlocking의 자식 async로 예외를 터뜨릴 경우 자식 코루틴의 예외는 부모에게 전파된다.**
+
+```kotlin
+fun main(): Unit = runBlocking {
+    val job = async {
+        throw IllegalArgumentException()
+    }
+    delay(1_000L)
+}
+///
+Exception in thread "main" java.lang.IllegalArgumentException
+	at Lec05Kt$main$1$job$1.invokeSuspend(Lec05.kt:8)
+```
+
+
+
+**SupervisorJob**
+
+```kotlin
+fun main(): Unit = runBlocking {
+    val job = async(SupervisorJob()) {
+        throw IllegalArgumentException()
+    }
+    delay(1_000L)
+}
+```
+
+SupervisorJob을 쓰면 자식코루틴의 예외를 부모코루틴에게 전파하지 않는다.
+
+
+
+#### launch의 예외를 다루는 방법
+
+기본적으로는 발생한 예외를 바로 던짐
+
+1. try - catch- finally 
+
+```kotlin
+fun main(): Unit = runBlocking {
+    val job = launch {
+        try {
+            throw IllegalArgumentException()
+        } catch (e: IllegalArgumentException) {
+            printWithThread("정상 종료")
+        }
+    }
+}
+```
+
+2. CoroutineExceptionHandler 
+   1. 공통 로직으로 **예외 발생 이후** 에러 로깅, 에러메시지 전송 등에 활용
+   2. try catch는 그 launch쪽 로직이 예외가 발생하지 않은 것 처럼 처리하는거라면, 이거는 예외는 발생 했지만 처리를 다른곳에서 하는느낌
+
+```kotlin
+fun main(): Unit = runBlocking {
+    val exceptionHandler = CoroutineExceptionHandler { _, _ ->
+        printWithThread("예외")
+    }
+
+    val job = CoroutineScope(Dispatchers.Default).launch(exceptionHandler) {
+        throw IllegalArgumentException();
+    }
+    delay(1_000L)
+}
+```
+
+**주의할점**
+
+- launch에만 적용 가능하고, 부모 코루틴이 있으면 동작하지 않는다.
+
+
+
+#### 취소와 예외 구분
+
+- CASE1. 발생한 예외가 CancellationException 인 경우 취소로 간주하고 부모 코루틴에게 전파하지 않는다.
+- CASE2. 그 외 다른 예외가 발생할 경우 실패로 간주하고 부모 코루틴에게 전파한다.
+- 내부적으로는 취소나 실패 모두 취소됨으로 관리한다
+
+
+
+**Job(코루틴)의 life Cycle**
+
+```
+NEW -> ACTIVE   - COMPLETING - COMPLETED
+        예외발생 \  /  - 예외, 취소 모두 cancel로 간주
+          CANCELLING -> CANCELLED
+```
+

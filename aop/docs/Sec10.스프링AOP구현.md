@@ -168,11 +168,51 @@ public class AspectV5Order {
 어드바이스는 Around 외에 여러가지가 있다.
 
 - `@Around` : 메서드 호출 전후에 수행, 가장 강력한 어드바이스, 조인 포인트 실행 여부 선택, 반환 값 변환, 예외 변환 등이 가능
+
+Around와 다르게 다른 어드바이스들은 작업 흐름을 변경할 수 없다. 
+
 - `@Before` : 조인포인트 실행 이전에 실행
 - `@After Returning` : 조인포인트 이후 정상 완료된 후에
+  - 만들 때 returning 타입이 맞아야 만들어진다.
+  - 반환되는 객체를 변경할 수 없다. 조작은 가능
 - `@After Throwing` : 예외 던져지는 경우에
 - `@After` : 정상 또는 예외 상관 없는 finally
 
+동일한 Aspect안에서 실행순서 우선순위 Around > Before > After > AfterReturning> AfterThrowing . 리턴 순서는 반대
+
+모든 어드바이스는 JoinPoint를 첫번째 파라미터에 사용할 수 있다.(생략도 가능)
 
 
 
+단 Around는 ProceedingJoinPoint를 사용해야 한다.
+
+- ProceedingJoinPoint는 JoinPoint의 하위 타입
+
+
+
+JoinPoint 인터페이스의 주요 기능
+
+- getArgs() : 메서드 인수 반환
+- getThis() : 프록시 객체 반환
+- getTarget() : 대상 객체 반환
+- getSignature() : 어드바이스 되는 메서드에 대한 설명 반환
+- toString() : 어드바이스 되는 방법에 대한 toString 출력
+
+
+
+ProceedingJoinPoint의 주요 기능
+
+- proceed() : 다음 어드바이스나 타겟을 호출한다.
+
+
+
+**Around외에 다른 어드바이스가 있는 경우**
+
+- 실수로 joinPoint.proceed를 호출하지 않았을 경우 체이닝이 안됨
+- 애노테이션을 보면 그 위치가 어노테이션 이름으로 바로 드러남
+
+
+
+**정리**
+
+좋은 설계는 제약이 있는 것이다.

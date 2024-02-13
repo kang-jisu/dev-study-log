@@ -62,3 +62,89 @@ AOP가 잘 적용되지 않는다면 내부 호출을 의심해보자.
 
 
 
+----
+
+## 프록시 기술과 한계
+
+
+
+### 1. 타입 캐스팅
+
+스프링이 프록시를 만들 때 제공하는 ProxyFactory에 proxyTargetClass 옵션에 따라 CGLIB, JDK 동적프록시 선택할 수 있다.
+
+- false : JDK
+- true : CGLIB
+
+
+
+#### JDK 동적 프록시의 한계가 있음
+
+```
+java.lang.ClassCastException: class jdk.proxy2.$Proxy9 cannot be cast to class hello.aop.member.MemberServiceImpl (jdk.proxy2.$Proxy9 is in module jdk.proxy2 of loader 'app'; hello.aop.member.MemberServiceImpl is in unnamed module of loader 'app')
+```
+
+MemberServiceImpl 타입 기반으로 JDK 동적 프록시를 생성함.
+
+MemberService 인터페이스 기반으로 생성한거니깐 MemberServiceImpl이 뭔지 모름
+
+
+
+CGLIB는 구체클래스를 기반으로 프록시를 생성하므로 타입 캐스팅이 가능함.
+
+
+
+### 2. 의존관계 주입
+
+JDK 동적프록시를 사용하면 구체 클래스 타입을 의존관계주입받을때 문제가 생긴다.
+
+memberServiceImpl 의존성주입이 안됨.
+
+
+
+
+
+JDK 프록시는 MemberService 인터페이스를 기반으로 만들어지기때문에 MemberServiceImpl타입이 뭔지 모름. 그래서 해당 타입에 주입할 수 없다.
+
+CGLIB는 구체클래스를 기반으로 만들기 때문에 MemberServiceImpl도 이걸 기반으로 만들었으니 해당 타입으로 캐스팅할 수 있어서 의존관계주입도 할 수 있다.
+
+
+
+JDK동적프록시는 대상 객체인 Impl타입에 의존관계를 주입할 수 없다.
+
+CGLIB 프록시는 대상 객체인 Impl타입에 의존관계 주입을 할 수 있다.
+
+
+
+올바르게 DI 하려면 인터페이스로 의존관계주입을 해줘야한다.
+
+### 3. CGLIB의 한계
+
+- 대상 클래스에 기본 생성자 필수
+  - 자바 언어에서 상속을 받으면 자식클래스 생성자 호출할 때 자식 클래스의 생성자에서 부모클래스의 생성자도 호출해야한다.
+  - CGLIB를 사용할 때 생성ㅇ자에서 대상클래스의 기본 생성자를 호출한다. 그래서 만들어줘야한다. 
+- 생성자가 2번 호출됨
+  - CGLIB는 구체클래스를 상속받음. 자바언어에서 상속을 받으면 자식클래스의 생성자를 호출할 때 부모클래스의 생성자도 호출해야한다.
+  - 실제 target 객체 생성할때, 프록시객체 생성할때 -> 부모 클래스의 생성자가 2번 호출됨
+- final 키워드 클래스, 메서드 사용 불가 (상속이 안되므로)
+  - 일반 웹 어플리케이션에서는 final키워드를 잘 사용하지는 않긴함.
+
+
+
+### 4. 스프링의 해결책
+
+- 스프링 3.2 , CGLIB 스프링 내부에 패키징 (spring-core)
+
+- 스프링 4.0부터 CGLIB 기본생성자 문제 해결
+
+  - objenesis 를 이용해 기본 생성자 없이 객체 생성 가능
+
+- 생성자2번 호출 문제
+
+  - 이것도 objenesis를 이용해 생성자가 1번만 호출된다
+
+- 스프링부트 2.0 -> CGLIB를 기본으로 사용함
+
+  - spring.aop.proxy--target-class=false로 JDK설정 가능, true가 기본값(CGLIB)
+
+  
+

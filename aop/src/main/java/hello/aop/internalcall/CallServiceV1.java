@@ -11,7 +11,7 @@ public class CallServiceV1 {
 
     private CallServiceV1 callServiceV1;
 
-    // 생성자 형식으로는 하면 안됨
+    // 생성자 형식으로는 하면 안됨. SET 방식으로
     @Autowired
     public void setCallServiceV1(CallServiceV1 callServiceV1) {
         log.info("callServiceV1 setter={}", callServiceV1.getClass());
